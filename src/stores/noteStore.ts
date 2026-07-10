@@ -26,6 +26,7 @@ export const useNoteStore = defineStore('note', () => {
 
   let savingInProgress = false;
   let pendingSave = false;
+  let consecutiveFailures = 0;
 
   async function syncCloud() {
     if (savingInProgress) {
@@ -37,18 +38,27 @@ export const useNoteStore = defineStore('note', () => {
     saveError.value = null;
     try {
       await saveCloudData(data.value);
+      consecutiveFailures = 0;
     } catch (e) {
       saveError.value = (e as Error).message;
+      consecutiveFailures++;
     } finally {
       savingInProgress = false;
-      // 如果保存期间又有新改动，立刻再保存一次
-      if (pendingSave) {
+      // 只有连续失败不超过2次且有待保存时才重试
+      if (pendingSave && consecutiveFailures < 3) {
         pendingSave = false;
         syncCloud();
       } else {
         saving.value = false;
+        pendingSave = false;
       }
     }
+  }
+
+  async function retrySync() {
+    consecutiveFailures = 0;
+    saveError.value = null;
+    await syncCloud();
   }
 
   function scheduleSync() {
@@ -247,6 +257,7 @@ export const useNoteStore = defineStore('note', () => {
     saving,
     saveError,
     loadFromCloud,
+    retrySync,
     getDates,
     getDay,
     addDay,

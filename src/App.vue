@@ -6,10 +6,7 @@
   </div>
   <div v-else-if="noteStore.loadError" class="loading-screen">
     <p class="load-error">云端加载失败：{{ noteStore.loadError }}</p>
-    <div class="loading-actions">
-      <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
-      <button class="btn-secondary" @click="useLocalData">使用本地数据</button>
-    </div>
+    <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
   </div>
   <div v-else id="app-root">
     <Sidebar />
@@ -22,9 +19,9 @@
       <div class="save-spinner"></div>
       <span>保存中...</span>
     </div>
-    <div v-if="noteStore.saveError" class="save-error-toast">
+    <div v-if="noteStore.saveError && !noteStore.saving" class="save-error-toast">
       <span>云端保存失败：{{ noteStore.saveError }}</span>
-      <button @click="noteStore.loadFromCloud">重试</button>
+      <button @click="noteStore.retrySync">重试保存</button>
     </div>
   </div>
 </template>
@@ -48,12 +45,6 @@ function onAuthed() {
 // 已认证时（刷新页面）自动加载
 if (authed.value && noteStore.loading) {
   noteStore.loadFromCloud();
-}
-
-// 离线模式：跳过云端，直接用 localStorage 里的数据
-function useLocalData() {
-  noteStore.loading = false;
-  noteStore.loadError = null;
 }
 </script>
 
@@ -79,11 +70,6 @@ function useLocalData() {
   justify-content: center;
   gap: 16px;
   color: var(--color-text-secondary);
-}
-
-.loading-actions {
-  display: flex;
-  gap: 12px;
 }
 
 .spinner {
