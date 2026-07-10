@@ -1,12 +1,26 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { DayData, NoteData, Trick, ProblemBrief, Knowledge, Difficulty } from '@/types';
-import { loadData, saveData } from '@/utils/storage';
+import { loadData, loadCloudData, saveCloudData, saveData } from '@/utils/storage';
 import { generateId } from '@/utils/id';
 import { parseTrick, parseKnowledge } from '@/utils/parser';
 
 export const useNoteStore = defineStore('note', () => {
   const data = ref<NoteData>(loadData());
+  const loading = ref(true);
+  const loadError = ref<string | null>(null);
+
+  async function loadFromCloud() {
+    loading.value = true;
+    loadError.value = null;
+    try {
+      data.value = await loadCloudData();
+    } catch (e) {
+      loadError.value = (e as Error).message;
+    } finally {
+      loading.value = false;
+    }
+  }
 
   const getDay = (date: string): DayData | null => data.value[date] || null;
 
@@ -25,6 +39,7 @@ export const useNoteStore = defineStore('note', () => {
         knowledge: [],
       };
       saveData(data.value);
+      saveCloudData(data.value);
     }
   }
 
@@ -32,6 +47,7 @@ export const useNoteStore = defineStore('note', () => {
     if (confirm(`确认删除 ${date} 的所有数据？`)) {
       delete data.value[date];
       saveData(data.value);
+      saveCloudData(data.value);
     }
   }
 
@@ -51,6 +67,7 @@ export const useNoteStore = defineStore('note', () => {
     }
     delete data.value[oldDate];
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   // ---- 日记 ----
@@ -59,6 +76,7 @@ export const useNoteStore = defineStore('note', () => {
     const newIds = lines.map(s => s.trim()).filter(Boolean);
     data.value[date].diary = [...newIds, ...data.value[date].diary];
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function deleteDiaryItem(date: string, problemId: string): void {
@@ -66,6 +84,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!day) return;
     day.diary = day.diary.filter(id => id !== problemId);
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   // ---- Tricks ----
@@ -75,6 +94,7 @@ export const useNoteStore = defineStore('note', () => {
     const newTrick: Trick = { ...parsed, id: generateId(), createdAt: Date.now() };
     data.value[date].tricks = [newTrick, ...data.value[date].tricks];
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function updateTrick(date: string, id: string, updates: Partial<Trick>): void {
@@ -84,6 +104,7 @@ export const useNoteStore = defineStore('note', () => {
     if (idx === -1) return;
     day.tricks[idx] = { ...day.tricks[idx], ...updates };
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function deleteTrick(date: string, id: string): void {
@@ -91,6 +112,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!day) return;
     day.tricks = day.tricks.filter(t => t.id !== id);
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   // ---- 思路速览（题目） ----
@@ -111,6 +133,7 @@ export const useNoteStore = defineStore('note', () => {
       data.value[date].diary = [input.id, ...data.value[date].diary];
     }
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function updateProblem(
@@ -124,6 +147,7 @@ export const useNoteStore = defineStore('note', () => {
     if (idx === -1) return;
     day.problems[idx] = { ...day.problems[idx], ...updates };
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function deleteProblem(date: string, id: string): void {
@@ -132,6 +156,7 @@ export const useNoteStore = defineStore('note', () => {
     day.problems = day.problems.filter(p => p.id !== id);
     day.diary = day.diary.filter(d => d !== id);
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   // ---- 知识点 ----
@@ -145,6 +170,7 @@ export const useNoteStore = defineStore('note', () => {
     };
     data.value[date].knowledge = [newKnowledge, ...data.value[date].knowledge];
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function updateKnowledge(
@@ -158,6 +184,7 @@ export const useNoteStore = defineStore('note', () => {
     if (idx === -1) return;
     day.knowledge[idx] = { ...day.knowledge[idx], ...updates };
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   function deleteKnowledge(date: string, id: string): void {
@@ -165,6 +192,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!day) return;
     day.knowledge = day.knowledge.filter(k => k.id !== id);
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   // ---- 数据导出/导入 ----
@@ -176,10 +204,14 @@ export const useNoteStore = defineStore('note', () => {
     const parsed = JSON.parse(json) as NoteData;
     data.value = parsed;
     saveData(data.value);
+    saveCloudData(data.value);
   }
 
   return {
     data,
+    loading,
+    loadError,
+    loadFromCloud,
     getDates,
     getDay,
     addDay,
