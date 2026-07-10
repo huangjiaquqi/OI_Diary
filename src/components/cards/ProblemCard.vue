@@ -6,7 +6,7 @@
         <span class="problem-id">{{ problem.id }}</span>
         <span class="difficulty-label">{{ DIFFICULTY_MAP[problem.difficulty].label }}</span>
       </div>
-      <div v-if="hover || isEditing" class="card-actions">
+      <div :class="['card-actions', { 'editing-visible': isEditing }]">
         <button class="btn-icon" @click="startEdit" title="修改">✏️</button>
         <button class="btn-icon btn-delete" @click="handleDelete" title="删除">✕</button>
       </div>
