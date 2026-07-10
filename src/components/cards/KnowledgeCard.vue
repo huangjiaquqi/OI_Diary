@@ -9,18 +9,19 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="core-idea">{{ knowledge.coreIdea }}</div>
+      <div class="core-idea" v-html="renderedCoreIdea"></div>
       <div v-if="knowledge.code">
-        <code
+        <div
           :class="['code-block', { collapsed: !codeExpanded }]"
           @click="codeExpanded = !codeExpanded"
-        >{{ knowledge.code }}</code>
+          v-html="renderedCode"
+        ></div>
         <span class="code-toggle" @click="codeExpanded = !codeExpanded">
           {{ codeExpanded ? '收起代码 ▲' : '展开代码 ▼' }}
         </span>
       </div>
       <ul v-if="knowledge.keyPoints.length > 0" class="key-points">
-        <li v-for="(kp, idx) in knowledge.keyPoints" :key="idx">{{ kp }}</li>
+        <li v-for="(kp, idx) in knowledge.keyPoints" :key="idx" v-html="renderedKeyPoint(kp)"></li>
       </ul>
     </div>
 
@@ -42,10 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Knowledge } from '@/types';
 import { useNoteStore } from '@/stores/noteStore';
 import { useUIStore } from '@/stores/uiStore';
+import { renderMarkdown } from '@/utils/markdown';
 
 const props = defineProps<{ knowledge: Knowledge }>();
 
@@ -61,6 +63,13 @@ const editForm = ref({
   code: props.knowledge.code || '',
   keyPointsText: props.knowledge.keyPoints.map(kp => `- ${kp}`).join('\n'),
 });
+
+const renderedCoreIdea = computed(() => renderMarkdown(props.knowledge.coreIdea));
+const renderedCode = computed(() => renderMarkdown(props.knowledge.code || ''));
+
+function renderedKeyPoint(kp: string) {
+  return renderMarkdown(kp);
+}
 
 function startEdit() {
   isEditing.value = true;

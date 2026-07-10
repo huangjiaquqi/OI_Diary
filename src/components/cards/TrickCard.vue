@@ -9,7 +9,7 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="description">{{ trick.description }}</div>
+      <div class="description" v-html="renderedDescription"></div>
     </div>
 
     <div v-else class="card-body edit-mode">
@@ -24,10 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Trick } from '@/types';
 import { useNoteStore } from '@/stores/noteStore';
 import { useUIStore } from '@/stores/uiStore';
+import { renderMarkdown } from '@/utils/markdown';
 
 const props = defineProps<{ trick: Trick }>();
 
@@ -37,6 +38,8 @@ const uiStore = useUIStore();
 const hover = ref(false);
 const isEditing = ref(false);
 const editForm = ref({ title: props.trick.title, description: props.trick.description });
+
+const renderedDescription = computed(() => renderMarkdown(props.trick.description));
 
 function startEdit() {
   isEditing.value = true;

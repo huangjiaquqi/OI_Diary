@@ -57,8 +57,99 @@
 
 .card-body .description {
   color: var(--color-text);
-  white-space: pre-wrap;
   line-height: 1.6;
+}
+
+/* Markdown 渲染后的样式 */
+.card-body .description > *:first-child,
+.card-body .core-idea > *:first-child,
+.card-body .overview > *:first-child,
+.card-body .idea > *:first-child,
+.card-body .gain > *:first-child {
+  margin-top: 0;
+}
+
+.card-body .description > *:last-child,
+.card-body .core-idea > *:last-child,
+.card-body .overview > *:last-child,
+.card-body .idea > *:last-child,
+.card-body .gain > *:last-child {
+  margin-bottom: 0;
+}
+
+.card-body .description p,
+.card-body .core-idea p,
+.card-body .overview p,
+.card-body .idea p,
+.card-body .gain p {
+  margin: 4px 0;
+}
+
+.card-body .description code,
+.card-body .core-idea code,
+.card-body .overview code,
+.card-body .idea code,
+.card-body .gain code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.card-body .description pre,
+.card-body .core-idea pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.card-body .description pre code,
+.card-body .core-idea pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+}
+
+.card-body .description ul,
+.card-body .description ol,
+.card-body .core-idea ul,
+.card-body .core-idea ol {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.card-body .description a,
+.card-body .core-idea a,
+.card-body .overview a,
+.card-body .idea a,
+.card-body .gain a {
+  color: var(--color-primary);
+}
+
+.card-body .description blockquote,
+.card-body .core-idea blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 12px;
+  color: var(--color-text-secondary);
+  margin: 8px 0;
+}
+
+.card-body .description h1,
+.card-body .description h2,
+.card-body .description h3,
+.card-body .description h4,
+.card-body .core-idea h1,
+.card-body .core-idea h2,
+.card-body .core-idea h3,
+.card-body .core-idea h4 {
+  margin: 8px 0 4px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .card-body .core-idea {

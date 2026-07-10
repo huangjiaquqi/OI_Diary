@@ -70,9 +70,7 @@ export async function loadCloudData(): Promise<NoteData> {
   return data;
 }
 
-async function saveCloudDataImmediate(data: NoteData): Promise<void> {
-  const sha = await fetchSha();
-
+async function doPut(data: NoteData, sha: string | null): Promise<Response> {
   const body: Record<string, unknown> = {
     message: `update notes ${new Date().toISOString()}`,
     content: btoa(unescape(encodeURIComponent(JSON.stringify(data)))),
@@ -80,7 +78,7 @@ async function saveCloudDataImmediate(data: NoteData): Promise<void> {
   };
   if (sha) body.sha = sha;
 
-  const res = await fetch(GH_API_URL, {
+  return fetch(GH_API_URL, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${GH_TOKEN}`,
@@ -89,6 +87,18 @@ async function saveCloudDataImmediate(data: NoteData): Promise<void> {
     },
     body: JSON.stringify(body),
   });
+}
+
+async function saveCloudDataImmediate(data: NoteData): Promise<void> {
+  let sha = await fetchSha();
+
+  let res = await doPut(data, sha);
+
+  // SHA 不匹配，重新获取 SHA 再试一次
+  if (res.status === 422) {
+    sha = await fetchSha();
+    res = await doPut(data, sha);
+  }
 
   if (!res.ok) {
     const errBody = await res.json().catch(() => ({}));

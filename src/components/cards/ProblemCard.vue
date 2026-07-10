@@ -13,9 +13,9 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="overview">{{ problem.overview }}</div>
-      <div class="idea">💡 {{ problem.idea }}</div>
-      <div v-if="problem.gain" class="gain">📌 {{ problem.gain }}</div>
+      <div class="overview" v-html="renderedOverview"></div>
+      <div class="idea" v-html="renderedIdea"></div>
+      <div v-if="problem.gain" class="gain" v-html="renderedGain"></div>
     </div>
 
     <div v-else class="card-body edit-mode">
@@ -36,6 +36,7 @@ import type { ProblemBrief } from '@/types';
 import { DIFFICULTY_MAP } from '@/types';
 import { useNoteStore } from '@/stores/noteStore';
 import { useUIStore } from '@/stores/uiStore';
+import { renderMarkdown } from '@/utils/markdown';
 
 const props = defineProps<{ problem: ProblemBrief }>();
 
@@ -51,6 +52,9 @@ const editForm = ref({
 });
 
 const color = computed(() => DIFFICULTY_MAP[props.problem.difficulty].color);
+const renderedOverview = computed(() => renderMarkdown(props.problem.overview));
+const renderedIdea = computed(() => renderMarkdown(props.problem.idea));
+const renderedGain = computed(() => (props.problem.gain ? renderMarkdown(props.problem.gain) : ''));
 
 function startEdit() {
   isEditing.value = true;
