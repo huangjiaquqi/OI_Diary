@@ -9,13 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fsegurai/marked-extended-typographic": "^17.0.0",
     "fuse.js": "^7.0.0",
     "highlight.js": "^11.11.1",
     "katex": "^0.17.0",
     "marked": "^18.0.6",
     "marked-highlight": "^2.2.4",
-    "marked-katex-extension": "^5.1.10",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
