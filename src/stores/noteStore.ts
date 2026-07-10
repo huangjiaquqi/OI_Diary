@@ -1,27 +1,59 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { DayData, NoteData, Trick, ProblemBrief, Knowledge, Difficulty } from '@/types';
-import { loadData, loadCloudData, saveCloudData, saveData } from '@/utils/storage';
+import { loadLocalData, loadCloudData, saveCloudData, saveLocalData, useLocalData } from '@/utils/storage';
 import { generateId } from '@/utils/id';
 import { parseTrick, parseKnowledge } from '@/utils/parser';
 
 export const useNoteStore = defineStore('note', () => {
-  const data = ref<NoteData>(loadData());
+  const data = ref<NoteData>(loadLocalData());
   const loading = ref(true);
   const loadError = ref<string | null>(null);
   const saving = ref(false);
   const saveError = ref<string | null>(null);
+  const loadConflict = ref(false);
+  let pendingCloudData: NoteData | null = null;
 
   async function loadFromCloud() {
     loading.value = true;
     loadError.value = null;
+    loadConflict.value = false;
+    pendingCloudData = null;
     try {
-      data.value = await loadCloudData();
+      const result = await loadCloudData();
+      if (result.conflict) {
+        // 本地和云端都有数据，让用户选择
+        loadConflict.value = true;
+        pendingCloudData = result.data;
+        loading.value = false;
+        return;
+      }
+      data.value = result.data;
+      saveLocalData(result.data);
     } catch (e) {
       loadError.value = (e as Error).message;
     } finally {
       loading.value = false;
     }
+  }
+
+  function resolveConflict(useLocal: boolean) {
+    if (useLocal) {
+      data.value = useLocalData();
+    } else if (pendingCloudData) {
+      data.value = pendingCloudData;
+      saveLocalData(pendingCloudData);
+    }
+    loadConflict.value = false;
+    pendingCloudData = null;
+  }
+
+  function useLocalOnly() {
+    data.value = useLocalData();
+    loading.value = false;
+    loadError.value = null;
+    loadConflict.value = false;
+    pendingCloudData = null;
   }
 
   let savingInProgress = false;
@@ -81,7 +113,7 @@ export const useNoteStore = defineStore('note', () => {
         problems: [],
         knowledge: [],
       };
-      saveData(data.value);
+      saveLocalData(data.value);
       scheduleSync();
     }
   }
@@ -89,7 +121,7 @@ export const useNoteStore = defineStore('note', () => {
   function deleteDay(date: string): void {
     if (confirm(`确认删除 ${date} 的所有数据？`)) {
       delete data.value[date];
-      saveData(data.value);
+      saveLocalData(data.value);
       scheduleSync();
     }
   }
@@ -109,7 +141,7 @@ export const useNoteStore = defineStore('note', () => {
       data.value[newDate] = { ...data.value[oldDate], date: newDate };
     }
     delete data.value[oldDate];
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -118,7 +150,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!data.value[date]) addDay(date);
     const newIds = lines.map(s => s.trim()).filter(Boolean);
     data.value[date].diary = [...newIds, ...data.value[date].diary];
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -126,7 +158,7 @@ export const useNoteStore = defineStore('note', () => {
     const day = data.value[date];
     if (!day) return;
     day.diary = day.diary.filter(id => id !== problemId);
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -136,7 +168,7 @@ export const useNoteStore = defineStore('note', () => {
     const parsed = parseTrick(raw);
     const newTrick: Trick = { ...parsed, id: generateId(), createdAt: Date.now() };
     data.value[date].tricks = [newTrick, ...data.value[date].tricks];
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -146,7 +178,7 @@ export const useNoteStore = defineStore('note', () => {
     const idx = day.tricks.findIndex(t => t.id === id);
     if (idx === -1) return;
     day.tricks[idx] = { ...day.tricks[idx], ...updates };
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -154,7 +186,7 @@ export const useNoteStore = defineStore('note', () => {
     const day = data.value[date];
     if (!day) return;
     day.tricks = day.tricks.filter(t => t.id !== id);
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -175,7 +207,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!data.value[date].diary.includes(input.id)) {
       data.value[date].diary = [input.id, ...data.value[date].diary];
     }
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -189,7 +221,7 @@ export const useNoteStore = defineStore('note', () => {
     const idx = day.problems.findIndex(p => p.id === id);
     if (idx === -1) return;
     day.problems[idx] = { ...day.problems[idx], ...updates };
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -198,7 +230,7 @@ export const useNoteStore = defineStore('note', () => {
     if (!day) return;
     day.problems = day.problems.filter(p => p.id !== id);
     day.diary = day.diary.filter(d => d !== id);
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -212,7 +244,7 @@ export const useNoteStore = defineStore('note', () => {
       createdAt: Date.now(),
     };
     data.value[date].knowledge = [newKnowledge, ...data.value[date].knowledge];
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -226,7 +258,7 @@ export const useNoteStore = defineStore('note', () => {
     const idx = day.knowledge.findIndex(k => k.id === id);
     if (idx === -1) return;
     day.knowledge[idx] = { ...day.knowledge[idx], ...updates };
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -234,7 +266,7 @@ export const useNoteStore = defineStore('note', () => {
     const day = data.value[date];
     if (!day) return;
     day.knowledge = day.knowledge.filter(k => k.id !== id);
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -246,7 +278,7 @@ export const useNoteStore = defineStore('note', () => {
   function importData(json: string): void {
     const parsed = JSON.parse(json) as NoteData;
     data.value = parsed;
-    saveData(data.value);
+    saveLocalData(data.value);
     scheduleSync();
   }
 
@@ -256,8 +288,11 @@ export const useNoteStore = defineStore('note', () => {
     loadError,
     saving,
     saveError,
+    loadConflict,
+    useLocalOnly,
     loadFromCloud,
     retrySync,
+    resolveConflict,
     getDates,
     getDay,
     addDay,
