@@ -17,8 +17,10 @@ export const useNoteStore = defineStore('note', () => {
     loadError.value = null;
     try {
       const cloudData = await loadCloudData();
-      data.value = cloudData;
+      // 云端数据写入本地缓存，不从云端直接赋值
       saveLocalData(cloudData);
+      // data 始终从本地缓存读取
+      data.value = loadLocalData();
     } catch (e) {
       loadError.value = (e as Error).message;
     } finally {
