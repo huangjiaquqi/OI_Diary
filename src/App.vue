@@ -5,8 +5,11 @@
     <p>正在加载云端数据...</p>
   </div>
   <div v-else-if="noteStore.loadError" class="loading-screen">
-    <p class="load-error">加载失败：{{ noteStore.loadError }}</p>
-    <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
+    <p class="load-error">云端加载失败：{{ noteStore.loadError }}</p>
+    <div class="loading-actions">
+      <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
+      <button class="btn-secondary" @click="useLocalData">使用本地数据</button>
+    </div>
   </div>
   <div v-else id="app-root">
     <Sidebar />
@@ -15,6 +18,14 @@
       <router-view />
     </main>
     <ImportModal />
+    <div v-if="noteStore.saving" class="save-indicator">
+      <div class="save-spinner"></div>
+      <span>保存中...</span>
+    </div>
+    <div v-if="noteStore.saveError" class="save-error-toast">
+      <span>云端保存失败：{{ noteStore.saveError }}</span>
+      <button @click="noteStore.loadFromCloud">重试</button>
+    </div>
   </div>
 </template>
 
@@ -34,9 +45,15 @@ function onAuthed() {
   noteStore.loadFromCloud();
 }
 
-// 如果已认证（刷新页面），自动加载云端数据
+// 已认证时（刷新页面）自动加载
 if (authed.value && noteStore.loading) {
   noteStore.loadFromCloud();
+}
+
+// 离线模式：跳过云端，直接用 localStorage 里的数据
+function useLocalData() {
+  noteStore.loading = false;
+  noteStore.loadError = null;
 }
 </script>
 
@@ -45,6 +62,7 @@ if (authed.value && noteStore.loading) {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .main-content {
@@ -63,11 +81,25 @@ if (authed.value && noteStore.loading) {
   color: var(--color-text-secondary);
 }
 
+.loading-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .spinner {
   width: 40px;
   height: 40px;
   border: 3px solid var(--color-border);
   border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.save-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -79,5 +111,47 @@ if (authed.value && noteStore.loading) {
 .load-error {
   color: var(--color-danger);
   font-size: 15px;
+}
+
+.save-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 500;
+}
+
+.save-error-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-danger);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 500;
+}
+
+.save-error-toast button {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 </style>
