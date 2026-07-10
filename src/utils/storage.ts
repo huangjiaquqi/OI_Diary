@@ -64,7 +64,7 @@ export async function loadCloudData(): Promise<NoteData> {
   if (!res.ok) throw new Error(`GitHub API ${res.status}`);
 
   const json = await res.json();
-  const content = atob(json.content.replace(/\n/g, ''));
+  const content = decodeURIComponent(escape(atob(json.content.replace(/\n/g, ''))));
   const data = JSON.parse(content) as NoteData;
   saveLocal(data);
   return data;
