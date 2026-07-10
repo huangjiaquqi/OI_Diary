@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [vue()],
-  base: './',
+  base: '/OI_Diary/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
