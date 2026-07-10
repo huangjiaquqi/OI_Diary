@@ -202,9 +202,9 @@
   padding-left: 24px;
   margin: 6px 0;
 }
-.markdown-body ul { list-style: none; }
-.markdown-body ul ul { list-style: none; }
-.markdown-body ul ul ul { list-style: none; }
+.markdown-body ul { list-style: none !important; }
+.markdown-body ul ul { list-style: none !important; }
+.markdown-body ul ul ul { list-style: none !important; }
 .markdown-body ol { list-style: decimal; }
 .markdown-body ol ol { list-style: lower-alpha; }
 .markdown-body ol ol ol { list-style: lower-roman; }
@@ -215,10 +215,10 @@
 /* --- 任务列表 --- */
 .markdown-body ul.contains-task-list,
 .markdown-body ol.contains-task-list {
-  list-style: none;
+  list-style: none !important;
   padding-left: 4px;
 }
-.markdown-body .task-list-item { list-style: none; }
+.markdown-body .task-list-item { list-style: none !important; }
 .markdown-body .task-list-item input[type="checkbox"] {
   margin-right: 8px;
   margin-left: 0;
@@ -403,18 +403,20 @@
 .card-body .key-points {
   margin-top: 8px;
   padding-left: 0;
-  list-style: none;
+  list-style: none !important;
 }
 
 .card-body .key-points li {
   padding: 4px 0;
   font-size: 0.8125rem;
-  color: var(--color-text);
-  position: relative;
+  color: var(--color-text) !important;
+  position: static;
 }
 
-.card-body .key-points li::before {
-  content: none;
+.card-body .key-points li::before,
+.card-body .key-points li::after {
+  content: none !important;
+  display: none;
 }
 
 .diary-item {
