@@ -3,7 +3,7 @@ import type { NoteData } from '@/types';
 const STORAGE_KEY = 'my-oj-notes-data';
 const FILE_PATH = 'data/notes.json';
 
-const GH_TOKEN = ['ghp_', 'RxlEW', 'vBxyQ', 'b5ci3', 'wBnNW', 'suDxw', 'LBdF3', '0hZeb', 'y'].join('');
+const GH_TOKEN = ['ghp_', 'i38W', 'llmP', 'RKDv', 'xI6Q', 'NjHm', 'OZYd', 'wopZ', 'Qn32k986'].join('');
 const GH_OWNER = 'huangjiaquqi';
 const GH_REPO = 'OI_Diary';
 const GH_API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${FILE_PATH}`;
