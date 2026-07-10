@@ -2,12 +2,12 @@
   <div class="card" @mouseenter="hover = true" @mouseleave="hover = false">
     <div class="card-header">
       <div class="card-title">{{ knowledge.title }}</div>
-      <div v-if="hover || isEditing" class="card-actions">
+      <div :class="['card-actions', { 'editing-visible': isEditing }]">
         <button class="btn-icon" @click="startEdit" title="修改">✏️</button>
         <button class="btn-icon btn-delete" @click="handleDelete" title="删除">✕</button>
       </div>
     </div>
-
+  
     <div v-if="!isEditing" class="card-body">
       <div class="core-idea markdown-body" v-html="renderedCoreIdea"></div>
       <div v-if="knowledge.code">
