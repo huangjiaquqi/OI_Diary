@@ -24,9 +24,15 @@ export const useNoteStore = defineStore('note', () => {
     }
   }
 
-  let saveTimer: ReturnType<typeof setTimeout> | null = null;
+  let savingInProgress = false;
+  let pendingSave = false;
 
   async function syncCloud() {
+    if (savingInProgress) {
+      pendingSave = true;
+      return;
+    }
+    savingInProgress = true;
     saving.value = true;
     saveError.value = null;
     try {
@@ -34,16 +40,19 @@ export const useNoteStore = defineStore('note', () => {
     } catch (e) {
       saveError.value = (e as Error).message;
     } finally {
-      saving.value = false;
+      savingInProgress = false;
+      // 如果保存期间又有新改动，立刻再保存一次
+      if (pendingSave) {
+        pendingSave = false;
+        syncCloud();
+      } else {
+        saving.value = false;
+      }
     }
   }
 
-  // 防抖保存：连续操作时只保存最后一次，避免 SHA 冲突
   function scheduleSync() {
-    if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      syncCloud();
-    }, 800);
+    syncCloud();
   }
 
   const getDay = (date: string): DayData | null => data.value[date] || null;
