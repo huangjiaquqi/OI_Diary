@@ -5,6 +5,10 @@
   padding: 20px 24px;
 }
 
+.card:hover {
+  /* 完全移除 hover 效果，防止任何抖动或间距变化 */
+}
+
 .card-header {
   display: flex;
   align-items: center;
@@ -37,7 +41,7 @@
 
 .card-body {
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: var(--color-text);
 }
 
 .card-body .overview {
@@ -100,7 +104,7 @@
 .markdown-body h2 { font-size: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 4px; }
 .markdown-body h3 { font-size: 0.9375rem; }
 .markdown-body h4 { font-size: 0.875rem; }
-.markdown-body h5, .markdown-body h6 { font-size: 0.8125rem; color: var(--color-text-secondary); }
+.markdown-body h5, .markdown-body h6 { font-size: 0.8125rem; color: var(--color-text); }
 
 /* --- 粗体 / 斜体 / 粗斜体 --- */
 .markdown-body strong { font-weight: 600; color: var(--color-text); }
@@ -407,12 +411,11 @@
 .card-body .key-points li {
   padding: 4px 0;
   font-size: 0.8125rem;
+  color: var(--color-text);
 }
 
 .card-body .key-points li::before {
-  content: '• ';
-  color: var(--color-primary);
-  font-weight: bold;
+  content: '';
 }
 
 .diary-item {
