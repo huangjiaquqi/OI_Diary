@@ -208,7 +208,14 @@
 .markdown-body ol { list-style: decimal; }
 .markdown-body ol ol { list-style: lower-alpha; }
 .markdown-body ol ol ol { list-style: lower-roman; }
-.markdown-body li { margin: 3px 0; }
+.markdown-body li { 
+  margin: 3px 0;
+  color: var(--color-text) !important;
+}
+.markdown-body li::marker {
+  content: none !important;
+  display: none;
+}
 .markdown-body li > ul, .markdown-body li > ol { margin: 2px 0; }
 .markdown-body li > p { margin: 2px 0; }
 
