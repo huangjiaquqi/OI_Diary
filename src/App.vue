@@ -1,5 +1,6 @@
 <template>
-  <div id="app-root">
+  <PasswordGate v-if="!authed" @authed="authed = true" />
+  <div v-else id="app-root">
     <Sidebar />
     <AppHeader />
     <main class="main-content">
@@ -10,9 +11,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import Sidebar from '@/components/layout/Sidebar.vue';
 import ImportModal from '@/components/modals/ImportModal.vue';
+import PasswordGate from '@/components/common/PasswordGate.vue';
+
+const authed = ref(sessionStorage.getItem('oj-notes-authed') === '1');
 </script>
 
 <style scoped>
