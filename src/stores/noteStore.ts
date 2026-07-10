@@ -35,6 +35,24 @@ export const useNoteStore = defineStore('note', () => {
     }
   }
 
+  function changeDate(oldDate: string, newDate: string): void {
+    if (oldDate === newDate) return;
+    if (!data.value[oldDate]) return;
+    if (data.value[newDate]) {
+      if (!confirm(`${newDate} 已存在，是否合并数据？`)) return;
+      const oldDay = data.value[oldDate];
+      const newDay = data.value[newDate];
+      newDay.diary = [...oldDay.diary, ...newDay.diary];
+      newDay.tricks = [...oldDay.tricks, ...newDay.tricks];
+      newDay.problems = [...oldDay.problems, ...newDay.problems];
+      newDay.knowledge = [...oldDay.knowledge, ...newDay.knowledge];
+    } else {
+      data.value[newDate] = { ...data.value[oldDate], date: newDate };
+    }
+    delete data.value[oldDate];
+    saveData(data.value);
+  }
+
   // ---- 日记 ----
   function importDiary(date: string, lines: string[]): void {
     if (!data.value[date]) addDay(date);
@@ -166,6 +184,7 @@ export const useNoteStore = defineStore('note', () => {
     getDay,
     addDay,
     deleteDay,
+    changeDate,
     importDiary,
     deleteDiaryItem,
     importTrick,

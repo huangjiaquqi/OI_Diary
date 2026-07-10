@@ -13,10 +13,30 @@
           :key="date"
           :class="['sidebar-item', { active: date === uiStore.currentDate }]"
         >
-          <span class="sidebar-date" @click="selectDate(date)">
-            {{ formatDisplayDate(date) }}
-          </span>
+          <template v-if="editingDate === date">
+            <input
+              v-model="editDateValue"
+              type="date"
+              class="sidebar-date-edit"
+              ref="editInput"
+              @blur="saveDateEdit(date)"
+              @keydown.enter="saveDateEdit(date)"
+              @keydown.esc="cancelDateEdit"
+            />
+          </template>
+          <template v-else>
+            <span class="sidebar-date" @click="selectDate(date)">
+              {{ formatDisplayDate(date) }}
+            </span>
+          </template>
           <div class="sidebar-actions">
+            <button
+              class="btn-icon"
+              @click.stop="startEditDate(date)"
+              title="修改日期"
+            >
+              ✎
+            </button>
             <button
               class="btn-icon"
               @click.stop="openImport(date)"
@@ -36,21 +56,14 @@
       </div>
 
       <div class="sidebar-footer">
-        <div v-if="showDatePicker" class="new-day-picker">
-          <input v-model="newDate" type="date" class="new-day-input" />
-          <div class="new-day-actions">
-            <button class="btn-primary btn-sm" @click="confirmNewDay">确定</button>
-            <button class="btn-secondary btn-sm" @click="showDatePicker = false">取消</button>
-          </div>
-        </div>
-        <button v-else class="btn-primary" @click="openDatePicker">＋ 新建天</button>
+        <button class="btn-primary" @click="createNewDay">＋ 新建天</button>
       </div>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, nextTick } from 'vue';
 import { useNoteStore } from '@/stores/noteStore';
 import { useUIStore } from '@/stores/uiStore';
 import { formatDisplayDate, getTodayStr } from '@/utils/date';
@@ -60,8 +73,9 @@ const uiStore = useUIStore();
 
 const dates = computed(() => noteStore.getDates);
 
-const showDatePicker = ref(false);
-const newDate = ref(getTodayStr());
+const editingDate = ref<string | null>(null);
+const editDateValue = ref('');
+const editInput = ref<HTMLInputElement | null>(null);
 
 function selectDate(date: string) {
   uiStore.selectDate(date);
@@ -73,16 +87,33 @@ function openImport(date: string) {
   uiStore.closeSidebar();
 }
 
-function openDatePicker() {
-  newDate.value = getTodayStr();
-  showDatePicker.value = true;
+function startEditDate(date: string) {
+  editingDate.value = date;
+  editDateValue.value = date;
+  nextTick(() => {
+    editInput.value?.focus();
+  });
 }
 
-function confirmNewDay() {
-  if (newDate.value) {
-    noteStore.addDay(newDate.value);
-    uiStore.selectDate(newDate.value);
-    showDatePicker.value = false;
+function saveDateEdit(oldDate: string) {
+  if (editingDate.value === null) return;
+  const newDate = editDateValue.value;
+  if (newDate && newDate !== oldDate) {
+    noteStore.changeDate(oldDate, newDate);
+    if (uiStore.currentDate === oldDate) {
+      uiStore.selectDate(newDate);
+    }
   }
+  editingDate.value = null;
+}
+
+function cancelDateEdit() {
+  editingDate.value = null;
+}
+
+function createNewDay() {
+  const today = getTodayStr();
+  noteStore.addDay(today);
+  uiStore.selectDate(today);
 }
 </script>

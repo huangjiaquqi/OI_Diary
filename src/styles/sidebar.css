@@ -118,32 +118,18 @@
   width: 100%;
 }
 
-.new-day-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.new-day-input {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: var(--radius);
+.sidebar-date-edit {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.1);
   color: var(--color-text-sidebar);
   color-scheme: dark;
+  font-size: 14px;
 }
 
-.new-day-input:focus {
+.sidebar-date-edit:focus {
   border-color: var(--color-primary);
   outline: none;
-}
-
-.new-day-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.new-day-actions button {
-  flex: 1;
 }

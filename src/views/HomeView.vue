@@ -1,9 +1,6 @@
 <template>
   <div class="home-view">
     <div class="home-header">
-      <div class="date-info">
-        <h2>{{ formatDisplayDate(uiStore.currentDate) }}</h2>
-      </div>
       <div class="home-actions">
         <ModuleTabs />
         <button class="btn-primary btn-sm" @click="openImportForCurrent">
@@ -47,6 +44,10 @@
 
       <EmptyState v-else message="暂无数据" hint="点击左侧边栏「新建天」或导入数据开始记录" />
     </div>
+
+    <div class="date-badge" v-if="dayData">
+      {{ formatDisplayDate(uiStore.currentDate) }}
+    </div>
   </div>
 </template>
 
@@ -85,20 +86,16 @@ function openImportForCurrent() {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
 }
 
 .home-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.date-info h2 {
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .home-actions {
@@ -109,5 +106,20 @@ function openImportForCurrent() {
 
 .home-content {
   min-height: 300px;
+}
+
+.date-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-md);
+  z-index: 40;
 }
 </style>
