@@ -36,23 +36,32 @@
       </div>
 
       <div class="sidebar-footer">
-        <button class="btn-primary" @click="createNewDay">＋ 新建天</button>
+        <div v-if="showDatePicker" class="new-day-picker">
+          <input v-model="newDate" type="date" class="new-day-input" />
+          <div class="new-day-actions">
+            <button class="btn-primary btn-sm" @click="confirmNewDay">确定</button>
+            <button class="btn-secondary btn-sm" @click="showDatePicker = false">取消</button>
+          </div>
+        </div>
+        <button v-else class="btn-primary" @click="openDatePicker">＋ 新建天</button>
       </div>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useNoteStore } from '@/stores/noteStore';
 import { useUIStore } from '@/stores/uiStore';
-import { formatDisplayDate } from '@/utils/date';
-import { getTodayStr } from '@/utils/date';
+import { formatDisplayDate, getTodayStr } from '@/utils/date';
 
 const noteStore = useNoteStore();
 const uiStore = useUIStore();
 
 const dates = computed(() => noteStore.getDates);
+
+const showDatePicker = ref(false);
+const newDate = ref(getTodayStr());
 
 function selectDate(date: string) {
   uiStore.selectDate(date);
@@ -64,9 +73,16 @@ function openImport(date: string) {
   uiStore.closeSidebar();
 }
 
-function createNewDay() {
-  const today = getTodayStr();
-  noteStore.addDay(today);
-  uiStore.selectDate(today);
+function openDatePicker() {
+  newDate.value = getTodayStr();
+  showDatePicker.value = true;
+}
+
+function confirmNewDay() {
+  if (newDate.value) {
+    noteStore.addDay(newDate.value);
+    uiStore.selectDate(newDate.value);
+    showDatePicker.value = false;
+  }
 }
 </script>
