@@ -5,9 +5,7 @@
   padding: 20px 24px;
 }
 
-.card:hover {
-  /* 完全移除 hover 效果，防止任何抖动或间距变化 */
-}
+/* 完全移除 card hover 效果，防止任何抖动或间距变化 */
 
 .card-header {
   display: flex;
@@ -204,9 +202,9 @@
   padding-left: 24px;
   margin: 6px 0;
 }
-.markdown-body ul { list-style: disc; }
-.markdown-body ul ul { list-style: circle; }
-.markdown-body ul ul ul { list-style: square; }
+.markdown-body ul { list-style: none; }
+.markdown-body ul ul { list-style: none; }
+.markdown-body ul ul ul { list-style: none; }
 .markdown-body ol { list-style: decimal; }
 .markdown-body ol ol { list-style: lower-alpha; }
 .markdown-body ol ol ol { list-style: lower-roman; }
@@ -412,10 +410,11 @@
   padding: 4px 0;
   font-size: 0.8125rem;
   color: var(--color-text);
+  position: relative;
 }
 
 .card-body .key-points li::before {
-  content: '';
+  content: none;
 }
 
 .diary-item {

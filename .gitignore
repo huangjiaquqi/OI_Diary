@@ -9,10 +9,6 @@ __pycache__/
 *.so
 *.a
 *.out
-*.swp
-*.swo
-*.tmp
-*.log
 # Dependencies
 .venv/
 venv/
@@ -23,6 +19,11 @@ dist/
 build/
 target/
 .gradle/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
 # Environment
 .env
 .env.local
@@ -30,13 +31,13 @@ target/
 # Editors
 .vscode/
 .idea/
+# System files
+.DS_Store
+Thumbs.db
 # Coverage
 coverage/
 htmlcov/
 .coverage
-# System files
-.DS_Store
-Thumbs.db
 # Compressed files
 *.zip
 *.gz
