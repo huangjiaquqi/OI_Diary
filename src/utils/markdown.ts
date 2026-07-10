@@ -1,21 +1,11 @@
 import { marked } from 'marked';
-import markedKatex from 'marked-katex-extension';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
+import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github-dark.min.css';
 
-// 配置 KaTeX 数学公式（支持内联 $...$ 和块级 $$...$$）
-marked.use(
-  markedKatex({
-    throwOnError: false,
-    nonStandard: true,
-    strict: false,
-    output: 'html',
-  }),
-);
-
-// 配置代码语法高亮（支持所有主流编程语言）
+// 配置代码语法高亮
 marked.use(
   markedHighlight({
     langPrefix: 'hljs language-',
@@ -38,15 +28,79 @@ marked.use(
 
 // 全局配置
 marked.setOptions({
-  gfm: true,         // GitHub Flavored Markdown：表格、删除线、任务列表、自动链接
-  breaks: true,      // 换行转 <br>
+  gfm: true,
+  breaks: true,
   pedantic: false,
 });
+
+function renderMath(html: string): string {
+  // 第一步：处理块级公式 $$...$$（必须放在 <pre> 和 <code> 之外）
+  // 使用占位符保护代码块
+  const codeBlocks: string[] = [];
+
+  // 保护 <pre>...</pre> 和 <code>...</code> 块
+  let processed = html.replace(
+    /<(pre|code)(?:\s[^>]*)?>[\s\S]*?<\/\1>/gi,
+    (match) => {
+      codeBlocks.push(match);
+      return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    },
+  );
+
+  // 处理块级公式 $$...$$
+  processed = processed.replace(
+    /\$\$([\s\S]*?)\$\$/g,
+    (_: string, formula: string) => {
+      try {
+        const trimmed = formula.trim();
+        if (!trimmed) return '';
+        return `<div class="katex-display">${katex.renderToString(trimmed, {
+          throwOnError: false,
+          displayMode: true,
+          strict: false,
+          trust: true,
+        })}</div>`;
+      } catch {
+        return `<span class="katex-error">[公式渲染错误]</span>`;
+      }
+    },
+  );
+
+  // 处理内联公式 $...$（排除 $$ 块和内联代码）
+  processed = processed.replace(
+    /(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g,
+    (_: string, formula: string) => {
+      try {
+        const trimmed = formula.trim();
+        if (!trimmed) return '';
+        return katex.renderToString(trimmed, {
+          throwOnError: false,
+          displayMode: false,
+          strict: false,
+          trust: true,
+        });
+      } catch {
+        return `<span class="katex-error">[公式渲染错误]</span>`;
+      }
+    },
+  );
+
+  // 恢复代码块
+  processed = processed.replace(
+    /__CODE_BLOCK_(\d+)__/g,
+    (_: string, index: string) => {
+      return codeBlocks[parseInt(index)];
+    },
+  );
+
+  return processed;
+}
 
 export function renderMarkdown(text: string): string {
   if (!text) return '';
   try {
-    return marked.parse(text) as string;
+    const html = marked.parse(text) as string;
+    return renderMath(html);
   } catch (e) {
     console.error('Markdown render error:', e);
     return text;
