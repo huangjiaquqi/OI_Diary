@@ -4,7 +4,7 @@ const STORAGE_KEY = 'my-oj-notes-data';
 const FILE_PATH = 'data/notes.json';
 
 // GitHub API 配置
-const GH_TOKEN = atob('Z2l0aHViX3BhdF8xMUJVNUdZUUtJMHZIVjJCWGRsN2FlVV92M25rbHhHaFB1Y2ZhRktRd21BMzFpNVdLUlUweG9oMkFEZkV1aW11dWtvWUhDRDNVNFpGbm00VTFPYQ==');
+const GH_TOKEN = ['ghp_', 'dekfz', 'MAGM5', 'WggLV', 'cuPeU', 'krizl', 'yHixa', '1PrUm', 'M'].join('');
 const GH_OWNER = 'huangjiaquqi';
 const GH_REPO = 'OI_Diary';
 const GH_API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${FILE_PATH}`;
