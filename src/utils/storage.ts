@@ -3,21 +3,10 @@ import type { NoteData } from '@/types';
 const STORAGE_KEY = 'my-oj-notes-data';
 const FILE_PATH = 'data/notes.json';
 
-// GitHub API 配置
 const GH_TOKEN = ['ghp_', 'RxlEW', 'vBxyQ', 'b5ci3', 'wBnNW', 'suDxw', 'LBdF3', '0hZeb', 'y'].join('');
 const GH_OWNER = 'huangjiaquqi';
 const GH_REPO = 'OI_Diary';
 const GH_API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${FILE_PATH}`;
-
-// ---- localStorage 本地缓存 ----
-export function loadLocalData(): NoteData {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
 
 function saveLocal(data: NoteData): void {
   try {
@@ -27,9 +16,15 @@ function saveLocal(data: NoteData): void {
   }
 }
 
-// ---- GitHub API 云存储 ----
+export function loadLocalData(): NoteData {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
 
-/** 从 GitHub 获取文件 SHA（不解析内容，仅用于保存前的 SHA 同步） */
 async function fetchSha(): Promise<string | null> {
   const res = await fetch(`${GH_API_URL}?ref=main`, {
     headers: {
@@ -43,15 +38,7 @@ async function fetchSha(): Promise<string | null> {
   return json.sha as string;
 }
 
-export interface LoadCloudResult {
-  data: NoteData;
-  conflict: boolean;
-  localHasData: boolean;
-}
-
-export async function loadCloudData(): Promise<LoadCloudResult> {
-  const localData = loadLocalData();
-
+export async function loadCloudData(): Promise<NoteData> {
   const res = await fetch(`${GH_API_URL}?ref=main`, {
     headers: {
       Authorization: `Bearer ${GH_TOKEN}`,
@@ -59,58 +46,31 @@ export async function loadCloudData(): Promise<LoadCloudResult> {
     },
   });
 
-  // 文件不存在 → 保留本地数据
   if (res.status === 404) {
-    const hasLocal = Object.keys(localData).length > 0;
-    return {
-      data: localData,
-      conflict: false,
-      localHasData: hasLocal,
-    };
+    // 云端没有文件，检查本地是否有数据需要上传
+    const localData = loadLocalData();
+    if (Object.keys(localData).length > 0) {
+      // 本地有数据，立刻上传到云端
+      saveLocal(localData);
+      try {
+        await saveCloudDataImmediate(localData);
+      } catch {
+        // 上传失败也不影响用户使用，本地数据已经在了
+      }
+    }
+    return localData;
   }
 
   if (!res.ok) throw new Error(`GitHub API ${res.status}`);
 
   const json = await res.json();
   const content = atob(json.content.replace(/\n/g, ''));
-  const cloudData = JSON.parse(content) as NoteData;
-
-  const cloudCount = Object.keys(cloudData).length;
-  const localCount = Object.keys(localData).length;
-
-  // 云端空 → 用本地
-  if (cloudCount === 0) {
-    saveLocal(localData);
-    return {
-      data: localData,
-      conflict: false,
-      localHasData: localCount > 0,
-    };
-  }
-
-  // 本地空 → 用云端
-  if (localCount === 0) {
-    saveLocal(cloudData);
-    return {
-      data: cloudData,
-      conflict: false,
-      localHasData: false,
-    };
-  }
-
-  // 两边都有数据 → 需要用户选择
-  return {
-    data: cloudData,
-    conflict: true,
-    localHasData: true,
-  };
+  const data = JSON.parse(content) as NoteData;
+  saveLocal(data);
+  return data;
 }
 
-export async function saveCloudData(data: NoteData): Promise<void> {
-  // 先保存到本地（永远先写本地，保证不丢）
-  saveLocal(data);
-
-  // 保存前先获取最新 SHA，彻底避免 409 冲突
+async function saveCloudDataImmediate(data: NoteData): Promise<void> {
   const sha = await fetchSha();
 
   const body: Record<string, unknown> = {
@@ -137,8 +97,9 @@ export async function saveCloudData(data: NoteData): Promise<void> {
   }
 }
 
-export function useLocalData(): NoteData {
-  return loadLocalData();
+export async function saveCloudData(data: NoteData): Promise<void> {
+  saveLocal(data);
+  await saveCloudDataImmediate(data);
 }
 
 export function saveLocalData(data: NoteData): void {

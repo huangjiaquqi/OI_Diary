@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { DayData, NoteData, Trick, ProblemBrief, Knowledge, Difficulty } from '@/types';
-import { loadLocalData, loadCloudData, saveCloudData, saveLocalData, useLocalData } from '@/utils/storage';
+import { loadLocalData, loadCloudData, saveCloudData, saveLocalData } from '@/utils/storage';
 import { generateId } from '@/utils/id';
 import { parseTrick, parseKnowledge } from '@/utils/parser';
 
@@ -11,49 +11,19 @@ export const useNoteStore = defineStore('note', () => {
   const loadError = ref<string | null>(null);
   const saving = ref(false);
   const saveError = ref<string | null>(null);
-  const loadConflict = ref(false);
-  let pendingCloudData: NoteData | null = null;
 
   async function loadFromCloud() {
     loading.value = true;
     loadError.value = null;
-    loadConflict.value = false;
-    pendingCloudData = null;
     try {
-      const result = await loadCloudData();
-      if (result.conflict) {
-        // 本地和云端都有数据，让用户选择
-        loadConflict.value = true;
-        pendingCloudData = result.data;
-        loading.value = false;
-        return;
-      }
-      data.value = result.data;
-      saveLocalData(result.data);
+      const cloudData = await loadCloudData();
+      data.value = cloudData;
+      saveLocalData(cloudData);
     } catch (e) {
       loadError.value = (e as Error).message;
     } finally {
       loading.value = false;
     }
-  }
-
-  function resolveConflict(useLocal: boolean) {
-    if (useLocal) {
-      data.value = useLocalData();
-    } else if (pendingCloudData) {
-      data.value = pendingCloudData;
-      saveLocalData(pendingCloudData);
-    }
-    loadConflict.value = false;
-    pendingCloudData = null;
-  }
-
-  function useLocalOnly() {
-    data.value = useLocalData();
-    loading.value = false;
-    loadError.value = null;
-    loadConflict.value = false;
-    pendingCloudData = null;
   }
 
   let savingInProgress = false;
@@ -288,11 +258,8 @@ export const useNoteStore = defineStore('note', () => {
     loadError,
     saving,
     saveError,
-    loadConflict,
-    useLocalOnly,
     loadFromCloud,
     retrySync,
-    resolveConflict,
     getDates,
     getDay,
     addDay,

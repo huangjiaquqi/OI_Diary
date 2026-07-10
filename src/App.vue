@@ -5,19 +5,8 @@
     <p>正在加载云端数据...</p>
   </div>
   <div v-else-if="noteStore.loadError" class="loading-screen">
-    <p class="load-error">加载失败：{{ noteStore.loadError }}</p>
-    <div class="loading-actions">
-      <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
-      <button class="btn-secondary" @click="noteStore.useLocalOnly">使用本地数据</button>
-    </div>
-  </div>
-  <div v-else-if="noteStore.loadConflict" class="loading-screen">
-    <p class="conflict-title">本地和云端都有数据</p>
-    <p class="conflict-desc">本地有新数据未同步到云端，请选择：</p>
-    <div class="loading-actions">
-      <button class="btn-primary" @click="noteStore.resolveConflict(true)">使用本地数据</button>
-      <button class="btn-secondary" @click="noteStore.resolveConflict(false)">使用云端数据</button>
-    </div>
+    <p class="load-error">云端加载失败：{{ noteStore.loadError }}</p>
+    <button class="btn-primary" @click="noteStore.loadFromCloud">重试</button>
   </div>
   <div v-else id="app-root">
     <Sidebar />
@@ -108,22 +97,6 @@ if (authed.value && noteStore.loading) {
 .load-error {
   color: var(--color-danger);
   font-size: 15px;
-}
-
-.conflict-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.conflict-desc {
-  color: var(--color-text-secondary);
-  font-size: 14px;
-}
-
-.loading-actions {
-  display: flex;
-  gap: 12px;
 }
 
 .save-indicator {
