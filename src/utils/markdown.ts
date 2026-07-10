@@ -1,7 +1,6 @@
 import { marked } from 'marked';
 import markedKatex from 'marked-katex-extension';
 import { markedHighlight } from 'marked-highlight';
-import markedExtendedTypographic from '@fsegurai/marked-extended-typographic';
 import hljs from 'highlight.js';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github-dark.min.css';
@@ -37,24 +36,11 @@ marked.use(
   }),
 );
 
-// 扩展排版：智能标点、符号替换、希腊字母、数学符号等（Typora 级别）
-marked.use(
-  markedExtendedTypographic({
-    enabled: {
-      smartQuotes: true,       // 智能引号："" → “”，'' → ‘’
-      dashes: true,            // 破折号：-- → –，--- → —
-      ellipses: true,          // 省略号：... → …
-      symbols: true,           // 符号替换：(c) → ©，(tm) → ™，(r) → ® 等
-      greekLetters: true,      // 希腊字母：(alpha) → α，(pi) → π
-      mathSymbols: true,       // 数学符号：(inf) → ∞，(neq) → ≠，(le) → ≤ 等
-      arrows: true,           // 箭头：(->) → →，(=>) ⇒，<-> ↔ 等
-      currency: true,         // 货币符号：(eur) → €，(pound) → £ 等
-    },
-  }),
-);
-
-// 自定义扩展支持高亮 ==text==、上标 ^text^、下标 ~text~
-// 使用自定义 tokenizer 实现这些 Typora 风格扩展
+// 自定义扩展支持：
+// - 高亮 ==text==
+// - 上标 ^text^
+// - 下标 ~text~
+// - 下划线 --text--
 const customExtensions = {
   extensions: [
     // 高亮 ==text==
@@ -71,7 +57,6 @@ const customExtensions = {
           return {
             type: 'highlight',
             raw: match[0],
-            text: match[1],
             tokens: this.lexer.inlineTokens(match[1]),
           };
         }
@@ -88,13 +73,13 @@ const customExtensions = {
         return src.indexOf('^');
       },
       tokenizer(src: string) {
-        const rule = /^\^([^\s^]+(?: [^\s^]+)*)\^/;
+        // 支持 x^y^ 格式
+        const rule = /^\^([^\^]+)\^/;
         const match = rule.exec(src);
         if (match) {
           return {
             type: 'superscript',
             raw: match[0],
-            text: match[1],
             tokens: this.lexer.inlineTokens(match[1]),
           };
         }
@@ -111,13 +96,13 @@ const customExtensions = {
         return src.indexOf('~');
       },
       tokenizer(src: string) {
-        const rule = /^~([^\s~]+(?: [^\s~]+)*)~/;
+        // 支持 H~2~O 格式
+        const rule = /^~([^~]+)~/;
         const match = rule.exec(src);
         if (match) {
           return {
             type: 'subscript',
             raw: match[0],
-            text: match[1],
             tokens: this.lexer.inlineTokens(match[1]),
           };
         }
@@ -126,8 +111,7 @@ const customExtensions = {
         return `<sub>${this.parser.parseInline(token.tokens)}</sub>`;
       },
     },
-    // 下划线 __text__ 或 _text_ 已经由 italic 处理，这里添加 *text* 斜体和 __text__ 粗斜体支持
-    // 实际上 marked 默认已经处理了，这里添加自定义下划线支持 --text--
+    // 下划线 --text--
     {
       name: 'underline',
       level: 'inline',
@@ -141,7 +125,6 @@ const customExtensions = {
           return {
             type: 'underline',
             raw: match[0],
-            text: match[1],
             tokens: this.lexer.inlineTokens(match[1]),
           };
         }
@@ -163,11 +146,117 @@ marked.setOptions({
   silent: true,      // 不抛出异常，出错时返回原文本
 });
 
+// 智能符号替换处理（手动处理，避免扩展依赖问题）
+function preprocessSymbols(text: string): string {
+  // (alpha) -> α, (beta) -> β, ... (pi) -> π
+  const greek: Record<string, string> = {
+    alpha: 'α', Alpha: 'Α',
+    beta: 'β', Beta: 'Β',
+    gamma: 'γ', Gamma: 'Γ',
+    delta: 'δ', Delta: 'Δ',
+    epsilon: 'ε', Epsilon: 'Ε',
+    zeta: 'ζ', Zeta: 'Ζ',
+    eta: 'η', Eta: 'Η',
+    theta: 'θ', Theta: 'Θ',
+    iota: 'ι', Iota: 'Ι',
+    kappa: 'κ', Kappa: 'Κ',
+    lambda: 'λ', Lambda: 'Λ',
+    mu: 'μ', Mu: 'Μ',
+    nu: 'ν', Nu: 'Ν',
+    xi: 'ξ', Xi: 'Ξ',
+    omicron: 'ο', Omicron: 'Ο',
+    pi: 'π', Pi: 'Π',
+    rho: 'ρ', Rho: 'Ρ',
+    sigma: 'σ', Sigma: 'Σ',
+    tau: 'τ', Tau: 'Τ',
+    upsilon: 'υ', Upsilon: 'Υ',
+    phi: 'φ', Phi: 'Φ',
+    chi: 'χ', Chi: 'Χ',
+    psi: 'ψ', Psi: 'Ψ',
+    omega: 'ω', Omega: 'Ω',
+  };
+
+  // 常用数学符号
+  const math: Record<string, string> = {
+    inf: '∞', infty: '∞',
+    neq: '≠',
+    eq: '=',
+    le: '≤',
+    ge: '≥',
+    lt: '<',
+    gt: '>',
+    pm: '±',
+    mp: '∓',
+    times: '×',
+    div: '÷',
+    cdot: '⋅',
+    prod: '∏',
+    sum: '∑',
+    int: '∫',
+    partial: '∂',
+    nabla: '∇',
+    forall: '∀',
+    exists: '∃',
+    emptyset: '∅',
+    in: '∈',
+    notin: '∉',
+    subset: '⊂',
+    supset: '⊃',
+    subseteq: '⊆',
+    supseteq: '⊇',
+    cup: '∪',
+    cap: '∩',
+    therefore: '∴',
+    because: '∵',
+    vdots: '⋮',
+    ddots: '⋱',
+  };
+
+  // 箭头
+  const arrows: Record<string, string> = {
+    '->': '→',
+    '=>': '⇒',
+    '<->': '↔',
+    '<=>': '⇔',
+    'leftarrow': '←',
+    'rightarrow': '→',
+    'Rightarrow': '⇒',
+    'Leftarrow': '⇐',
+  };
+
+  // 符号
+  const symbols: Record<string, string> = {
+    c: '©',
+    tm: '™',
+    r: '®',
+    eur: '€',
+    pound: '£',
+    yen: '¥',
+    degree: '°',
+    plusminus: '±',
+  };
+
+  // 替换所有 (xxx)
+  let processed = text.replace(/\(([a-zA-Z]+)\)/g, (_, key) => {
+    return greek[key] || math[key] || arrows[key] || symbols[key] || `(${key})`;
+  });
+
+  // 智能标点：-- -> –, --- -> —, ... -> …
+  processed = processed.replace(/---/g, '—');
+  processed = processed.replace(/--/g, '–');
+  processed = processed.replace(/\.\.\./g, '…');
+
+  return processed;
+}
+
 export function renderMarkdown(text: string): string {
   if (!text) return '';
   try {
-    return marked.parse(text) as string;
-  } catch {
+    // 先进行符号预处理，再解析
+    const processed = preprocessSymbols(text);
+    return marked.parse(processed) as string;
+  } catch (e) {
+    console.error('Markdown render error:', e);
     return text;
   }
 }
