@@ -154,11 +154,11 @@ function triggerImport() {
 }
 
 .menu-btn {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 .app-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -176,7 +176,7 @@ function triggerImport() {
 .search-box input {
   width: 100%;
   padding: 7px 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   border-radius: 20px;
   background: var(--color-bg);
 }
@@ -203,7 +203,7 @@ function triggerImport() {
   padding: 10px 14px;
   cursor: pointer;
   transition: background var(--transition);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .suggestion-item:hover {
@@ -211,7 +211,7 @@ function triggerImport() {
 }
 
 .suggestion-type {
-  font-size: 11px;
+  font-size: 0.6875rem;
   padding: 2px 6px;
   border-radius: 4px;
   background: #e0e7ff;
@@ -227,7 +227,7 @@ function triggerImport() {
 }
 
 .suggestion-date {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
   flex-shrink: 0;
 }
@@ -250,13 +250,13 @@ function triggerImport() {
 }
 
 .font-label {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-text-secondary);
   font-weight: 500;
 }
 
 .font-label-lg {
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--color-text-secondary);
   font-weight: 500;
 }

@@ -111,7 +111,7 @@ doSearch();
 }
 
 .search-header h2 {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 
@@ -122,7 +122,7 @@ doSearch();
 .search-input-lg {
   width: 100%;
   padding: 12px 16px;
-  font-size: 16px;
+  font-size: 1rem;
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
 }
@@ -160,7 +160,7 @@ doSearch();
 }
 
 .result-type-badge {
-  font-size: 11px;
+  font-size: 0.6875rem;
   padding: 2px 6px;
   border-radius: 4px;
   background: #e0e7ff;
@@ -169,17 +169,17 @@ doSearch();
 
 .result-title {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .result-date {
   margin-left: auto;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
 .result-preview {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;

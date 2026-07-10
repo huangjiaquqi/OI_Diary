@@ -1,5 +1,5 @@
 <template>
-  <div class="home-view" :style="{ '--content-font-size': uiStore.fontSize + 'px' }">
+  <div class="home-view">
     <div class="home-header">
       <div class="home-actions">
         <ModuleTabs />
@@ -117,7 +117,7 @@ function openImportForCurrent() {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 10px 16px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text-secondary);
   box-shadow: var(--shadow-md);

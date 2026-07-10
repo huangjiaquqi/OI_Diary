@@ -27,15 +27,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import Sidebar from '@/components/layout/Sidebar.vue';
 import ImportModal from '@/components/modals/ImportModal.vue';
 import PasswordGate from '@/components/common/PasswordGate.vue';
 import { useNoteStore } from '@/stores/noteStore';
+import { useUIStore } from '@/stores/uiStore';
 
 const authed = ref(sessionStorage.getItem('oj-notes-authed') === '1');
 const noteStore = useNoteStore();
+const uiStore = useUIStore();
+
+// 同步字体大小到 html 元素，实现全局字体缩放
+watch(() => uiStore.fontSize, (val) => {
+  document.documentElement.style.setProperty('--content-font-size', val + 'px');
+}, { immediate: true });
 
 function onAuthed() {
   authed.value = true;
@@ -96,7 +103,7 @@ if (authed.value && noteStore.loading) {
 
 .load-error {
   color: var(--color-danger);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .save-indicator {
@@ -108,7 +115,7 @@ if (authed.value && noteStore.loading) {
   color: #fff;
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -125,7 +132,7 @@ if (authed.value && noteStore.loading) {
   color: #fff;
   padding: 10px 16px;
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -138,6 +145,6 @@ if (authed.value && noteStore.loading) {
   color: #fff;
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 </style>

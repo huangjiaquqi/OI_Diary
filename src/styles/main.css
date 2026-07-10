@@ -9,7 +9,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: var(--content-font-size, 16px);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -100,7 +100,7 @@ select:focus {
   width: 32px;
   height: 32px;
   border-radius: var(--radius);
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: background var(--transition);
 }
 
@@ -115,7 +115,7 @@ select:focus {
 
 .btn-sm {
   padding: 4px 10px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   border-radius: 6px;
 }
 

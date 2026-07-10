@@ -77,18 +77,18 @@ onMounted(() => {
 }
 
 .gate-icon {
-  font-size: 48px;
+  font-size: 3rem;
   margin-bottom: 16px;
 }
 
 .gate-title {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
 .gate-hint {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-secondary);
   margin-bottom: 20px;
 }
@@ -96,7 +96,7 @@ onMounted(() => {
 .gate-input {
   width: 100%;
   padding: 10px 14px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   outline: none;
@@ -111,7 +111,7 @@ onMounted(() => {
 
 .gate-error {
   color: var(--color-danger);
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: 12px;
 }
 
@@ -121,7 +121,7 @@ onMounted(() => {
   background: var(--color-primary);
   color: #fff;
   border-radius: var(--radius);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   transition: background var(--transition);
 }

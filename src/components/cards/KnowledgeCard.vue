@@ -4,7 +4,7 @@
       <div class="card-title">{{ knowledge.title }}</div>
       <div v-if="hover || isEditing" class="card-actions">
         <button class="btn-icon" @click="startEdit" title="修改">✏️</button>
-        <button class="btn-icon danger" @click="handleDelete" title="删除">🗑️</button>
+        <button class="btn-icon btn-delete" @click="handleDelete" title="删除">✕</button>
       </div>
     </div>
 
