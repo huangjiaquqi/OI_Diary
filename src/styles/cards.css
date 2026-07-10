@@ -2,7 +2,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 20px 24px;
   transition: box-shadow var(--transition), border-color var(--transition);
 }
 
@@ -32,7 +32,7 @@
 }
 
 .card-body {
-  font-size: 14px;
+  font-size: var(--content-font-size, 14px);
   color: var(--color-text-secondary);
 }
 
@@ -73,7 +73,7 @@
   line-height: 1.8;
   word-wrap: break-word;
   word-break: break-word;
-  font-size: 14px;
+  font-size: var(--content-font-size, 14px);
 }
 
 .markdown-body > *:first-child { margin-top: 0 !important; }
@@ -446,12 +446,6 @@
   display: grid;
   gap: 12px;
   grid-template-columns: 1fr;
-}
-
-@media (min-width: 768px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .edit-mode {

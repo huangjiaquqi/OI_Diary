@@ -30,6 +30,19 @@
       </div>
     </div>
     <div class="header-right">
+      <div class="font-slider">
+        <span class="font-label">Aa</span>
+        <input
+          type="range"
+          min="14"
+          max="24"
+          step="1"
+          :value="uiStore.fontSize"
+          @input="(e) => uiStore.fontSize = parseInt((e.target as HTMLInputElement).value)"
+          class="font-range"
+        />
+        <span class="font-label-lg">Aa</span>
+      </div>
       <button class="btn-secondary btn-sm" @click="exportData">导出</button>
       <button class="btn-secondary btn-sm" @click="triggerImport">导入</button>
     </div>
@@ -221,7 +234,58 @@ function triggerImport() {
 
 .header-right {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+  align-items: center;
+}
+
+.font-slider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  border-right: 1px solid var(--color-border);
+  padding-right: 12px;
+  margin-right: 2px;
+}
+
+.font-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.font-label-lg {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.font-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.font-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.font-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }
 </style>
