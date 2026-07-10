@@ -9,7 +9,7 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="description" v-html="renderedDescription"></div>
+      <div class="description markdown-body" v-html="renderedDescription"></div>
     </div>
 
     <div v-else class="card-body edit-mode">

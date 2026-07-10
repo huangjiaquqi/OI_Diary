@@ -13,9 +13,9 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="overview" v-html="renderedOverview"></div>
-      <div class="idea" v-html="renderedIdea"></div>
-      <div v-if="problem.gain" class="gain" v-html="renderedGain"></div>
+      <div class="overview markdown-body" v-html="renderedOverview"></div>
+      <div class="idea markdown-body" v-html="renderedIdea"></div>
+      <div v-if="problem.gain" class="gain markdown-body" v-html="renderedGain"></div>
     </div>
 
     <div v-else class="card-body edit-mode">

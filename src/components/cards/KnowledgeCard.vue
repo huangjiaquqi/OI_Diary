@@ -9,11 +9,10 @@
     </div>
 
     <div v-if="!isEditing" class="card-body">
-      <div class="core-idea" v-html="renderedCoreIdea"></div>
+      <div class="core-idea markdown-body" v-html="renderedCoreIdea"></div>
       <div v-if="knowledge.code">
         <div
-          :class="['code-block', { collapsed: !codeExpanded }]"
-          @click="codeExpanded = !codeExpanded"
+          :class="['code-block markdown-body', { collapsed: !codeExpanded }]"
           v-html="renderedCode"
         ></div>
         <span class="code-toggle" @click="codeExpanded = !codeExpanded">
