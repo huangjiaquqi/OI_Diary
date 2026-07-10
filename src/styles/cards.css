@@ -7,16 +7,6 @@
   contain: layout style paint;
 }
 
-/* 完全移除 card hover 效果，防止任何抖动或间距变化 */
-.card:hover {
-  transform: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 20px 24px !important;
-  height: auto !important;
-  line-height: 1.6 !important;
-}
-
 .card-header {
   display: flex;
   align-items: center;
