@@ -1,8 +1,14 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'assets/**'
+      - 'index.html'
+      - 'index.dev.html'
+      - 'favicon.svg'
+      - '.nojekyll'
   workflow_dispatch:
 
 permissions:
@@ -22,9 +28,17 @@ jobs:
 
       - run: npm run build
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
+      - name: Copy dist to root
+        run: |
+          cp dist/index.html index.html
+          cp dist/favicon.svg favicon.svg
+          mkdir -p assets
+          cp -r dist/assets/* assets/
+          touch .nojekyll
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html favicon.svg assets/ .nojekyll
+          git diff --staged --quiet || (git commit -m "deploy: 更新构建产物" && git push origin main)
