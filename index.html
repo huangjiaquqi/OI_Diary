@@ -606,7 +606,7 @@ const GH_TOKEN = ['ghp_','i38W','llmP','RKDv','xI6Q','NjHm','OZYd','wopZ','Qn32k
 const GH_OWNER = 'huangjiaquqi';
 const GH_REPO = 'OI_Diary';
 const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${FILE_PATH}`;
-const RAW_URL = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${FILE_PATH}`;
+const RAW_URL = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/json-storage/${FILE_PATH}`;
 
 async function loadData() {
   const res = await fetch(RAW_URL);
@@ -617,7 +617,7 @@ async function loadData() {
 
 async function saveData(data) {
   let sha = '';
-  const getRes = await fetch(GH_API+'?ref=main', {
+  const getRes = await fetch(GH_API+'?ref=json-storage', {
     headers: { Authorization: 'Bearer '+GH_TOKEN, Accept: 'application/vnd.github+json' }
   });
   if (getRes.ok) { const j = await getRes.json(); sha = j.sha || ''; }
@@ -625,7 +625,7 @@ async function saveData(data) {
   const body = {
     message: 'update notes '+new Date().toISOString(),
     content: btoa(unescape(encodeURIComponent(JSON.stringify(data)))),
-    branch: 'main',
+    branch: 'json-storage',
     ...(sha?{sha}:{})
   };
 
@@ -636,7 +636,7 @@ async function saveData(data) {
   });
 
   if (res.status === 422) {
-    const getRes2 = await fetch(GH_API+'?ref=main', {
+    const getRes2 = await fetch(GH_API+'?ref=json-storage', {
       headers: { Authorization: 'Bearer '+GH_TOKEN, Accept: 'application/vnd.github+json' }
     });
     if (getRes2.ok) { const j2 = await getRes2.json(); body.sha = j2.sha || ''; }
