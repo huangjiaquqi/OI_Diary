@@ -335,6 +335,7 @@ a:hover{text-decoration:underline}
         </div>
         <button class="btn-secondary btn-sm" @click="exportData">导出</button>
         <button class="btn-secondary btn-sm" @click="triggerImport">导入</button>
+        <button class="btn-secondary btn-sm" @click="reselectFile" title="更换数据文件">📁</button>
       </div>
     </header>
 
@@ -553,8 +554,9 @@ a:hover{text-decoration:underline}
     </div>
     <div v-if="saveOk" class="save-toast">已保存</div>
     <div v-if="saveError" class="save-error-toast">
-      <span>保存失败: {{saveError}}</span>
+      <span>保存失败</span>
       <button @click="saveError=null;save()">重试</button>
+      <button @click="reselectFile">重新选择文件</button>
     </div>
   </div>
 </div>
@@ -882,6 +884,14 @@ const app = Vue.createApp({
         console.error('Save error:', e);
         this.saveError = e.message || '保存失败';
       }
+    },
+
+    async reselectFile() {
+      this.fileReady = false;
+      this.fileHandle = null;
+      this.saveError = null;
+      this.fileStatus = '';
+      this.fileError = '';
     },
 
     // ===== Auth =====
