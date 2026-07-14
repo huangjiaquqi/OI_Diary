@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My OJ Notes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+/* ===== Variables ===== */
+:root {
+  --color-primary: #4f46e5; --color-primary-hover: #4338ca;
+  --color-danger: #ef4444; --color-danger-hover: #dc2626;
+  --color-bg: #f8fafc; --color-bg-card: #ffffff;
+  --color-bg-sidebar: #1e293b; --color-text: #1e293b;
+  --color-text-secondary: #64748b; --color-text-sidebar: #e2e8f0;
+  --color-border: #e2e8f0; --color-border-hover: #cbd5e1;
+  --radius: 8px; --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+  --font-mono: 'JetBrains Mono','Fira Code','Consolas',monospace;
+  --transition: 0.2s ease; --sidebar-width: 280px; --header-height: 56px;
+  --content-font-size: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:var(--content-font-size);-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--color-bg);color:var(--color-text);line-height:1.6;min-height:100vh}
+#app{min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;font-size:inherit}
+input,textarea,select{font-family:inherit;font-size:inherit;color:var(--color-text);border:1px solid var(--color-border);border-radius:var(--radius);padding:8px 12px;outline:none;transition:border-color var(--transition)}
+input:focus,textarea:focus,select:focus{border-color:var(--color-primary)}
+a{color:var(--color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--color-border-hover);border-radius:3px}
+
+/* ===== Buttons ===== */
+.btn-primary{background:var(--color-primary);color:#fff;padding:8px 16px;border-radius:var(--radius);font-weight:500;transition:background var(--transition)}
+.btn-primary:hover{background:var(--color-primary-hover)}
+.btn-secondary{background:var(--color-border);color:var(--color-text);padding:8px 16px;border-radius:var(--radius);font-weight:500;transition:background var(--transition)}
+.btn-secondary:hover{background:var(--color-border-hover)}
+.btn-sm{padding:4px 10px;font-size:0.8125rem;border-radius:6px}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius);font-size:0.875rem;transition:background var(--transition)}
+.btn-icon:hover{background:var(--color-border)}
+.btn-icon.danger:hover{background:#fee2e2;color:var(--color-danger)}
+
+/* ===== File Select Screen ===== */
+.file-select-overlay{position:fixed;inset:0;background:var(--color-bg);display:flex;align-items:center;justify-content:center;z-index:999}
+.file-select-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:40px 36px;width:400px;text-align:center}
+.file-select-icon{font-size:3rem;margin-bottom:16px}
+.file-select-title{font-size:1.125rem;font-weight:700;margin-bottom:8px}
+.file-select-hint{font-size:0.8125rem;color:var(--color-text-secondary);margin-bottom:20px;line-height:1.6}
+.file-select-btn{display:inline-block;padding:10px 24px;background:var(--color-primary);color:#fff;border-radius:var(--radius);font-size:0.9375rem;font-weight:500;cursor:pointer;transition:background var(--transition)}
+.file-select-btn:hover{background:var(--color-primary-hover)}
+.file-select-status{font-size:0.8125rem;color:var(--color-text-secondary);margin-top:12px}
+.file-select-error{font-size:0.8125rem;color:var(--color-danger);margin-top:12px}
+
+/* ===== App Root ===== */
+.app-root{min-height:100vh;display:flex;flex-direction:column;position:relative}
+.main-content{flex:1;display:flex;flex-direction:column}
+
+/* ===== Sidebar ===== */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:90}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-width);background:var(--color-bg-sidebar);color:var(--color-text-sidebar);z-index:100;transform:translateX(-100%);transition:transform var(--transition);display:flex;flex-direction:column}
+.sidebar.open{transform:translateX(0)}
+.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.sidebar-header h2{font-size:1rem;font-weight:600}
+.sidebar-close{color:var(--color-text-sidebar);font-size:1.125rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.sidebar-close:hover{background:rgba(255,255,255,0.1)}
+.sidebar-body{flex:1;overflow-y:auto;padding:8px}
+.sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:var(--radius);transition:background var(--transition);cursor:pointer}
+.sidebar-item:hover{background:rgba(255,255,255,0.08)}
+.sidebar-item.active{background:rgba(255,255,255,0.12)}
+.sidebar-date{flex:1;font-size:0.875rem}
+.sidebar-actions{display:flex;gap:4px;opacity:0;transition:opacity var(--transition)}
+.sidebar-item:hover .sidebar-actions{opacity:1}
+.sidebar-actions .btn-icon{color:var(--color-text-sidebar);font-size:1rem;width:28px;height:28px}
+.sidebar-actions .btn-icon:hover{background:rgba(255,255,255,0.15)}
+.sidebar-actions .btn-icon.danger:hover{background:rgba(239,68,68,0.3);color:#fca5a5}
+.sidebar-footer{padding:12px;border-top:1px solid rgba(255,255,255,0.1)}
+.sidebar-footer .btn-primary{width:100%}
+.sidebar-date-edit{flex:1;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:var(--color-text-sidebar);color-scheme:dark;font-size:0.875rem}
+.sidebar-date-edit:focus{border-color:var(--color-primary);outline:none}
+
+/* ===== Header ===== */
+.app-header{display:flex;align-items:center;justify-content:space-between;height:var(--header-height);padding:0 16px;background:var(--color-bg-card);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50;gap:16px}
+.header-left{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.menu-btn{font-size:1.25rem}
+.app-title{font-size:1.125rem;font-weight:700;color:var(--color-primary)}
+.header-center{flex:1;max-width:500px;position:relative}
+.search-box{position:relative}
+.search-box input{width:100%;padding:7px 12px;font-size:0.875rem;border-radius:20px;background:var(--color-bg)}
+.search-suggestions{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius);box-shadow:var(--shadow-lg);max-height:280px;overflow-y:auto;z-index:300}
+.suggestion-item{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:0.875rem}
+.suggestion-item:hover{background:var(--color-bg)}
+.suggestion-type{font-size:0.6875rem;padding:2px 6px;border-radius:4px;background:#e0e7ff;color:var(--color-primary);flex-shrink:0}
+.suggestion-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.suggestion-date{font-size:0.75rem;color:var(--color-text-secondary);flex-shrink:0}
+.header-right{display:flex;gap:10px;flex-shrink:0;align-items:center}
+.font-slider{display:flex;align-items:center;gap:6px;padding:0 4px;border-right:1px solid var(--color-border);padding-right:12px;margin-right:2px}
+.font-label{font-size:0.6875rem;color:var(--color-text-secondary);font-weight:500}
+.font-label-lg{font-size:0.9375rem;color:var(--color-text-secondary);font-weight:500}
+.font-range{-webkit-appearance:none;appearance:none;width:70px;height:4px;background:var(--color-border);border-radius:2px;outline:none;cursor:pointer;border:none;padding:0}
+.font-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--color-primary);cursor:pointer}
+.font-range::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+/* ===== Module Tabs ===== */
+.module-tabs{display:flex;gap:4px;background:var(--color-border);padding:4px;border-radius:var(--radius);width:fit-content}
+.module-tab{padding:6px 16px;border-radius:6px;font-size:0.875rem;font-weight:500;color:var(--color-text-secondary);transition:all var(--transition)}
+.module-tab:hover{color:var(--color-text)}
+.module-tab.active{background:var(--color-bg-card);color:var(--color-primary);box-shadow:var(--shadow-sm)}
+
+/* ===== Home View ===== */
+.home-view{flex:1;padding:20px 32px;max-width:1300px;margin:0 auto;width:100%;position:relative}
+.home-header{display:flex;align-items:center;justify-content:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.home-actions{display:flex;align-items:center;gap:12px}
+.home-content{min-height:300px}
+.date-badge{position:fixed;bottom:20px;right:24px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:10px 16px;font-size:0.8125rem;font-weight:600;color:var(--color-text-secondary);box-shadow:var(--shadow-md);z-index:40}
+
+/* ===== Search View ===== */
+.search-view{flex:1;padding:20px 24px;max-width:700px;margin:0 auto;width:100%}
+.search-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.search-header h2{font-size:1.25rem;font-weight:700}
+.search-input-row{margin-bottom:20px}
+.search-input-lg{width:100%;padding:12px 16px;font-size:1rem;border-radius:var(--radius)}
+.search-input-lg:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(79,70,229,0.15)}
+.search-results{display:flex;flex-direction:column;gap:8px}
+.search-result-item{padding:14px 16px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius);cursor:pointer}
+.search-result-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
+.result-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.result-type-badge{font-size:0.6875rem;padding:2px 6px;border-radius:4px;background:#e0e7ff;color:var(--color-primary)}
+.result-title{font-weight:600;font-size:0.875rem}
+.result-date{margin-left:auto;font-size:0.75rem;color:var(--color-text-secondary)}
+.result-preview{font-size:0.8125rem;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== Cards ===== */
+.card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:20px 24px;position:relative}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;height:24px}
+.card-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.9375rem;line-height:1.4}
+.card-actions{display:flex;gap:4px;position:absolute;top:20px;right:24px;opacity:0;visibility:hidden;transition:opacity 0.15s,visibility 0.15s;z-index:10}
+.card:hover .card-actions,.card-actions.editing-visible{opacity:1;visibility:visible}
+.card-actions .btn-icon{background:transparent;padding:4px 6px;border-radius:4px;font-size:1rem;color:var(--color-text);display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.card-actions .btn-icon:hover{background:#f1f5f9}
+.card-actions .btn-delete{color:var(--color-danger);font-weight:bold;font-size:1.1rem}
+.card-actions .btn-delete:hover{background:#fee2e2}
+.card-body{font-size:0.875rem;color:var(--color-text);line-height:1.6}
+
+/* ===== Markdown ===== */
+.markdown-body{color:var(--color-text);line-height:1.8;word-wrap:break-word;word-break:break-word;font-size:0.875rem}
+.markdown-body>*:first-child{margin-top:0!important}
+.markdown-body>*:last-child{margin-bottom:0!important}
+.markdown-body p{margin:8px 0}
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin:16px 0 8px;font-weight:600;line-height:1.4}
+.markdown-body h1{font-size:1.125rem;border-bottom:1px solid var(--color-border);padding-bottom:6px}
+.markdown-body h2{font-size:1rem;border-bottom:1px solid var(--color-border);padding-bottom:4px}
+.markdown-body h3{font-size:0.9375rem}
+.markdown-body h4{font-size:0.875rem}
+.markdown-body h5,.markdown-body h6{font-size:0.8125rem}
+.markdown-body strong{font-weight:600}
+.markdown-body em{font-style:italic}
+.markdown-body del{text-decoration:line-through;color:var(--color-text-secondary)}
+.markdown-body code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:0.8125rem;color:#e11d48;word-break:break-all}
+.markdown-body pre{background:#0d1117;padding:14px 16px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:0.8125rem;line-height:1.55}
+.markdown-body pre code{background:none;padding:0;color:#c9d1d9;font-size:0.8125rem;border-radius:0;word-break:normal}
+.markdown-body blockquote{border-left:4px solid var(--color-primary);padding:8px 14px;margin:10px 0;color:var(--color-text-secondary);background:#f8fafc;border-radius:0 6px 6px 0}
+.markdown-body ul,.markdown-body ol{padding-left:24px;margin:6px 0}
+.markdown-body ul{list-style:none!important}
+.markdown-body ol{list-style:decimal}
+.markdown-body li{margin:3px 0;color:#1e293b!important}
+.markdown-body li::marker{content:none!important;display:none!important}
+.markdown-body table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.8125rem;display:block;overflow-x:auto}
+.markdown-body thead{border-bottom:2px solid var(--color-border)}
+.markdown-body th{background:#f1f5f9;font-weight:600;padding:8px 12px;border:1px solid var(--color-border);text-align:left;white-space:nowrap}
+.markdown-body td{padding:6px 12px;border:1px solid var(--color-border)}
+.markdown-body tr:nth-child(even) td{background:#f8fafc}
+.markdown-body tbody tr:hover td{background:#eef2ff}
+.markdown-body hr{border:none;border-top:1px solid var(--color-border);margin:16px 0}
+.markdown-body img{max-width:100%;border-radius:6px;margin:8px 0;display:block}
+.markdown-body .katex{font-size:1.05em}
+.markdown-body .katex-display{margin:12px 0;overflow-x:auto;overflow-y:hidden;padding:4px 0}
+.markdown-body .katex-display>.katex{display:inline-block;white-space:nowrap;max-width:100%}
+.markdown-body p .katex,.markdown-body li .katex,.markdown-body td .katex{font-size:1em}
+
+/* ===== Card Extras ===== */
+.card-body .overview{margin-bottom:8px;color:var(--color-text)}
+.card-body .idea{padding:8px;background:#f0f9ff;border-radius:6px;margin-bottom:8px}
+.card-body .gain{padding:8px;background:#fefce8;border-radius:6px;font-size:0.8125rem;margin-bottom:8px}
+.card-body .core-idea{color:var(--color-text);margin-bottom:8px}
+.card-body .code-block{margin-top:8px;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-family:var(--font-mono);font-size:0.8125rem;overflow-x:auto;white-space:pre-wrap}
+.card-body .code-block.collapsed{display:none}
+.code-toggle{color:var(--color-primary);font-size:0.8125rem;cursor:pointer;margin-top:4px;display:inline-block}
+.key-points{margin-top:8px;padding-left:0;list-style:none!important}
+.key-points li{padding:4px 0;font-size:0.8125rem;color:#1e293b!important;list-style:none!important}
+.key-points li::before,.key-points li::after,.key-points li::marker{content:none!important;display:none!important}
+
+/* ===== Diary ===== */
+.diary-list{display:flex;flex-direction:column;gap:6px}
+.diary-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f1f5f9;border-radius:6px;font-family:var(--font-mono);font-size:0.875rem}
+.diary-item .delete-btn{opacity:0;visibility:hidden;transition:opacity 0.2s,visibility 0.2s;font-size:1rem;color:var(--color-danger);font-weight:bold;cursor:pointer;padding:0 4px;line-height:1;background:transparent;border:none}
+.diary-item:hover .delete-btn{opacity:1;visibility:visible}
+.difficulty-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.cards-grid{display:grid;gap:12px;grid-template-columns:1fr}
+
+/* ===== Edit Mode ===== */
+.edit-mode{display:flex;flex-direction:column;gap:8px}
+.edit-mode input,.edit-mode textarea{width:100%}
+.edit-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* ===== Modal ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--color-bg-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--color-border)}
+.modal-header h3{font-size:1rem;font-weight:600}
+.modal-close{font-size:1.125rem;color:var(--color-text-secondary);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.modal-close:hover{background:var(--color-border);color:var(--color-text)}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:16px 20px;border-top:1px solid var(--color-border)}
+.import-type-tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--color-border);padding:3px;border-radius:var(--radius)}
+.import-type-tab{flex:1;padding:7px 0;border-radius:6px;font-size:0.8125rem;font-weight:500;text-align:center;color:var(--color-text-secondary);transition:all var(--transition)}
+.import-type-tab:hover{color:var(--color-text)}
+.import-type-tab.active{background:var(--color-bg-card);color:var(--color-primary);box-shadow:var(--shadow-sm)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:0.8125rem;font-weight:500;margin-bottom:4px;color:var(--color-text-secondary)}
+.form-group textarea,.form-group input,.form-group select{width:100%}
+.form-group textarea{resize:vertical;min-height:100px}
+
+/* ===== Empty State ===== */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--color-text-secondary);text-align:center}
+.empty-icon{font-size:3rem;margin-bottom:16px;opacity:0.5}
+.empty-text{font-size:0.9375rem;margin-bottom:8px}
+.empty-hint{font-size:0.8125rem}
+
+/* ===== Loading & Toast ===== */
+.loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--color-primary);z-index:999;display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-size:0.75rem;padding-top:20px}
+.loading-spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+.save-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:6px 16px;border-radius:20px;font-size:0.75rem;box-shadow:var(--shadow-lg);z-index:500;opacity:0.9;transition:opacity 0.3s}
+.save-error-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--color-danger);color:#fff;padding:8px 16px;border-radius:var(--radius);font-size:0.75rem;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);z-index:500}
+.save-error-toast button{background:rgba(255,255,255,0.2);color:#fff;padding:4px 10px;border-radius:4px;font-size:0.75rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- File Select Screen -->
+  <div v-if="!fileReady" class="file-select-overlay">
+    <div class="file-select-card">
+      <div class="file-select-icon">📁</div>
+      <h2 class="file-select-title">选择数据文件</h2>
+      <p class="file-select-hint">请选择 <code>data/notes.json</code> 文件<br>之后每次打开都会自动记住</p>
+      <button class="file-select-btn" @click="selectFile" :disabled="selectingFile">
+        {{ selectingFile ? '选择中...' : '选择 notes.json' }}
+      </button>
+      <p v-if="fileStatus" class="file-select-status">{{ fileStatus }}</p>
+      <p v-if="fileError" class="file-select-error">{{ fileError }}</p>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div v-else class="app-root">
+    <!-- Sidebar -->
+    <div v-if="sidebarOpen" class="sidebar-overlay"></div>
+    <aside :class="['sidebar',{open:sidebarOpen}]">
+      <div class="sidebar-header">
+        <h2>日期列表</h2>
+        <button class="sidebar-close" @click="sidebarOpen=false">✕</button>
+      </div>
+      <div class="sidebar-body">
+        <div v-for="date in sortedDates" :key="date" :class="['sidebar-item',{active:date===currentDate}]">
+          <template v-if="editingDate===date">
+            <input v-model="editDateVal" type="date" class="sidebar-date-edit" @blur="saveDateEdit(date)" @keydown.enter="saveDateEdit(date)" @keydown.esc="editingDate=null" ref="editRef">
+          </template>
+          <template v-else>
+            <span class="sidebar-date" @click="selectDate(date)">{{fmtDate(date)}}</span>
+          </template>
+          <div class="sidebar-actions">
+            <button class="btn-icon" @click.stop="startEditDate(date)" title="修改日期">✎</button>
+            <button class="btn-icon" @click.stop="openImport(date)" title="导入">+</button>
+            <button class="btn-icon danger" @click.stop="deleteDay(date)" title="删除当天">×</button>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="btn-primary" @click="createNewDay">＋ 新建天</button>
+      </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <button class="btn-icon menu-btn" @click="sidebarOpen=!sidebarOpen" title="日期列表">☰</button>
+        <h1 class="app-title">My OJ Notes</h1>
+      </div>
+      <div class="header-center">
+        <div class="search-box">
+          <input v-model="searchQ" type="text" placeholder="搜索题号、Trick、知识点..." @keydown.enter="goSearch" @input="onSearchInput">
+          <div v-if="suggestions.length>0" class="search-suggestions">
+            <div v-for="(s,i) in suggestions" :key="i" class="suggestion-item" @click="goSuggestion(s)">
+              <span class="suggestion-type">{{typeLabel(s.type)}}</span>
+              <span class="suggestion-title">{{s.title}}</span>
+              <span class="suggestion-date">{{s.date}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="font-slider">
+          <span class="font-label">Aa</span>
+          <input type="range" min="14" max="24" step="1" :value="fontSize" @input="onFontSize" class="font-range">
+          <span class="font-label-lg">Aa</span>
+        </div>
+        <button class="btn-secondary btn-sm" @click="exportData">导出</button>
+        <button class="btn-secondary btn-sm" @click="triggerImport">导入</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Search View -->
+      <div v-if="currentView==='search'" class="search-view">
+        <div class="search-header">
+          <h2>搜索结果</h2>
+          <button class="btn-secondary btn-sm" @click="currentView='home';searchQ='';suggestions=[]">← 返回主页</button>
+        </div>
+        <div class="search-input-row">
+          <input v-model="searchQ" type="text" placeholder="搜索题号、Trick、知识点..." class="search-input-lg" @input="onSearchInput">
+        </div>
+        <div v-if="searchQ.trim()&&searchResults.length===0" class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">未找到匹配结果</div>
+        </div>
+        <div v-if="searchResults.length>0" class="search-results">
+          <div v-for="(s,i) in searchResults" :key="i" class="search-result-item" @click="goSuggestion(s)">
+            <div class="result-header">
+              <span class="result-type-badge">{{typeLabel(s.type)}}</span>
+              <span class="result-title">{{s.title}}</span>
+              <span class="result-date">{{s.date}}</span>
+            </div>
+            <div class="result-preview">{{s.preview}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home View -->
+      <div v-else class="home-view">
+        <div class="home-header">
+          <div class="home-actions">
+            <div class="module-tabs">
+              <button v-for="t in tabs" :key="t.key" :class="['module-tab',{active:currentModule===t.key}]" @click="currentModule=t.key">{{t.label}}</button>
+            </div>
+            <button class="btn-primary btn-sm" @click="openImport(currentDate)">＋ 导入</button>
+          </div>
+        </div>
+        <div class="home-content">
+          <template v-if="dayData">
+            <!-- Diary -->
+            <div v-if="currentModule==='diary'">
+              <div v-if="dayData.diary.length>0" class="diary-list">
+                <div v-for="pid in dayData.diary" :key="pid" class="diary-item">
+                  <span class="diary-pid">{{pid}}</span>
+                  <button class="delete-btn" @click="deleteDiaryItem(pid)" title="删除">×</button>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无日记</div>
+                <div class="empty-hint">点击导入按钮添加刷题日记</div>
+              </div>
+            </div>
+            <!-- Tricks -->
+            <div v-if="currentModule==='tricks'">
+              <div v-if="dayData.tricks.length>0" class="cards-grid">
+                <div v-for="t in dayData.tricks" :key="t.id" class="card">
+                  <div class="card-header">
+                    <div class="card-title">{{t.title}}</div>
+                    <div :class="['card-actions',{'editing-visible':t._editing}]">
+                      <button class="btn-icon" @click="startEditTrick(t)" title="修改">✏️</button>
+                      <button class="btn-icon btn-delete" @click="deleteTrick(t.id)" title="删除">✕</button>
+                    </div>
+                  </div>
+                  <div v-if="!t._editing" class="card-body">
+                    <div class="description markdown-body" v-html="renderMD(t.description)"></div>
+                  </div>
+                  <div v-else class="card-body edit-mode">
+                    <input v-model="t._efTitle" placeholder="标题">
+                    <textarea v-model="t._efDesc" placeholder="描述" rows="4"></textarea>
+                    <div class="edit-actions">
+                      <button class="btn-primary" @click="saveEditTrick(t)">保存</button>
+                      <button class="btn-secondary" @click="cancelEditTrick(t)">取消</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无Tricks</div>
+                <div class="empty-hint">点击导入按钮添加Trick</div>
+              </div>
+            </div>
+            <!-- Problems -->
+            <div v-if="currentModule==='problems'">
+              <div v-if="dayData.problems.length>0" class="cards-grid">
+                <div v-for="p in dayData.problems" :key="p.id" class="card">
+                  <div class="card-header">
+                    <div class="card-title">
+                      <span class="difficulty-dot" :style="{background:diffColor(p.difficulty)}"></span>
+                      <span class="problem-id">{{p.id}}</span>
+                      <span class="difficulty-label">{{diffLabel(p.difficulty)}}</span>
+                    </div>
+                    <div :class="['card-actions',{'editing-visible':p._editing}]">
+                      <button class="btn-icon" @click="startEditProblem(p)" title="修改">✏️</button>
+                      <button class="btn-icon btn-delete" @click="deleteProblem(p.id)" title="删除">✕</button>
+                    </div>
+                  </div>
+                  <div v-if="!p._editing" class="card-body">
+                    <div class="overview markdown-body" v-html="renderMD(p.overview)"></div>
+                    <div class="idea markdown-body" v-html="renderMD(p.idea)"></div>
+                    <div v-if="p.gain" class="gain markdown-body" v-html="renderMD(p.gain)"></div>
+                  </div>
+                  <div v-else class="card-body edit-mode">
+                    <input v-model="p._efOverview" placeholder="题面概览">
+                    <textarea v-model="p._efIdea" placeholder="思路概况" rows="3"></textarea>
+                    <textarea v-model="p._efGain" placeholder="收获（可选）" rows="2"></textarea>
+                    <select v-model.number="p._efDifficulty">
+                      <option v-for="d in diffs" :key="d.v" :value="d.v">{{d.l}}</option>
+                    </select>
+                    <div class="edit-actions">
+                      <button class="btn-primary" @click="saveEditProblem(p)">保存</button>
+                      <button class="btn-secondary" @click="cancelEditProblem(p)">取消</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无题目</div>
+                <div class="empty-hint">点击导入按钮添加题目</div>
+              </div>
+            </div>
+            <!-- Knowledge -->
+            <div v-if="currentModule==='knowledge'">
+              <div v-if="dayData.knowledge.length>0" class="cards-grid">
+                <div v-for="k in dayData.knowledge" :key="k.id" class="card">
+                  <div class="card-header">
+                    <div class="card-title">{{k.title}}</div>
+                    <div :class="['card-actions',{'editing-visible':k._editing}]">
+                      <button class="btn-icon" @click="startEditKnowledge(k)" title="修改">✏️</button>
+                      <button class="btn-icon btn-delete" @click="deleteKnowledge(k.id)" title="删除">✕</button>
+                    </div>
+                  </div>
+                  <div v-if="!k._editing" class="card-body">
+                    <div class="core-idea markdown-body" v-html="renderMD(k.coreIdea)"></div>
+                    <div v-if="k.code">
+                      <div :class="['code-block markdown-body',{collapsed:!k._codeExpanded}]" v-html="renderMD(k.code)"></div>
+                      <span class="code-toggle" @click="k._codeExpanded=!k._codeExpanded">{{k._codeExpanded?'收起代码 ▲':'展开代码 ▼'}}</span>
+                    </div>
+                    <ul v-if="k.keyPoints&&k.keyPoints.length>0" class="key-points">
+                      <li v-for="(kp,i) in k.keyPoints" :key="i" v-html="renderMD(kp)"></li>
+                    </ul>
+                  </div>
+                  <div v-else class="card-body edit-mode">
+                    <input v-model="k._efTitle" placeholder="标题">
+                    <textarea v-model="k._efCoreIdea" placeholder="核心思想" rows="3"></textarea>
+                    <textarea v-model="k._efCode" placeholder="代码（可选）" rows="4"></textarea>
+                    <textarea v-model="k._efKeyPoints" placeholder="关键点（每行一个，以 - 开头）" rows="3"></textarea>
+                    <div class="edit-actions">
+                      <button class="btn-primary" @click="saveEditKnowledge(k)">保存</button>
+                      <button class="btn-secondary" @click="cancelEditKnowledge(k)">取消</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无知识点</div>
+                <div class="empty-hint">点击导入按钮添加知识点</div>
+              </div>
+            </div>
+          </template>
+          <div v-else class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">暂无数据</div>
+            <div class="empty-hint">点击左侧边栏「新建天」或导入数据开始记录</div>
+          </div>
+        </div>
+        <div v-if="dayData" class="date-badge">{{fmtDate(currentDate)}}</div>
+      </div>
+    </main>
+
+    <!-- Import Modal -->
+    <div v-if="importOpen" class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>导入数据 - {{importTargetDate}}</h3>
+          <button class="modal-close" @click="importOpen=false">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="import-type-tabs">
+            <button v-for="t in importTypes" :key="t.key" :class="['import-type-tab',{active:importType===t.key}]" @click="importType=t.key">{{t.label}}</button>
+          </div>
+          <div v-if="importType==='diary'">
+            <div class="form-group"><label>题号列表（每行一个）</label><textarea v-model="impDiary" placeholder="P1001&#10;P1002&#10;P1003" rows="6"></textarea></div>
+          </div>
+          <div v-if="importType==='trick'">
+            <div class="form-group"><label>标题</label><input v-model="impTrickTitle" placeholder="### 标题"></div>
+            <div class="form-group"><label>描述</label><textarea v-model="impTrickDesc" placeholder="描述内容..." rows="5"></textarea></div>
+          </div>
+          <div v-if="importType==='problem'">
+            <div class="form-group"><label>题号</label><input v-model="impProbId" placeholder="P1001"></div>
+            <div class="form-group"><label>难度</label><select v-model.number="impProbDiff"><option v-for="d in diffs" :key="d.v" :value="d.v">{{d.l}}</option></select></div>
+            <div class="form-group"><label>题面概览</label><textarea v-model="impProbOverview" placeholder="简述题目大意..." rows="3"></textarea></div>
+            <div class="form-group"><label>思路概况</label><textarea v-model="impProbIdea" placeholder="解题思路..." rows="3"></textarea></div>
+            <div class="form-group"><label>收获（可选）</label><textarea v-model="impProbGain" placeholder="从本题中学到的..." rows="2"></textarea></div>
+          </div>
+          <div v-if="importType==='knowledge'">
+            <div class="form-group"><label>标题</label><input v-model="impKnowTitle" placeholder="### 标题"></div>
+            <div class="form-group"><label>核心思想</label><textarea v-model="impKnowCore" placeholder="核心思想描述..." rows="3"></textarea></div>
+            <div class="form-group"><label>代码（可选）</label><textarea v-model="impKnowCode" placeholder="```cpp&#10;// 代码&#10;```" rows="5"></textarea></div>
+            <div class="form-group"><label>关键点（每行一个，以 - 开头）</label><textarea v-model="impKnowKP" placeholder="- 关键点1&#10;- 关键点2" rows="3"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" @click="importOpen=false">取消</button>
+          <button class="btn-primary" @click="doImport">导入</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading/Saving indicators -->
+    <div v-if="loading" class="loading-bar">
+      <div class="loading-spinner"></div><span>加载中...</span>
+    </div>
+    <div v-if="saveOk" class="save-toast">已保存</div>
+    <div v-if="saveError" class="save-error-toast">
+      <span>保存失败: {{saveError}}</span>
+      <button @click="saveError=null;save()">重试</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+<script>
+// ==================== Local File Storage (File System Access API + IndexedDB) ====================
+const DB_NAME = 'oj-notes-db';
+const DB_STORE = 'handles';
+const DB_KEY = 'notes-file-handle';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => { req.result.createObjectStore(DB_STORE); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getStoredHandle() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(DB_KEY);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch { return null; }
+}
+
+async function storeHandle(handle) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(handle, DB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch { /* ignore */ }
+}
+
+async function readLocalFile(handle) {
+  const file = await handle.getFile();
+  return JSON.parse(await file.text());
+}
+
+async function writeLocalFile(handle, data) {
+  const writable = await handle.createWritable();
+  await writable.write(JSON.stringify(data, null, 2));
+  await writable.close();
+}
+
+// ==================== Markdown ====================
+marked.setOptions({ gfm: true, breaks: true, pedantic: false });
+const origRenderer = new marked.Renderer();
+origRenderer.code = function(code, language) {
+  const validLang = language && hljs.getLanguage(language);
+  const highlighted = validLang ? hljs.highlight(code, { language }).value : hljs.highlightAuto(code).value;
+  return '<pre><code class="hljs'+(validLang?' language-'+language:'')+'">'+highlighted+'</code></pre>';
+};
+marked.setOptions({ renderer: origRenderer });
+
+function katexRender(formula, display) {
+  try {
+    return katex.renderToString(formula, { throwOnError: false, displayMode: display, strict: false, trust: true });
+  } catch(e) {
+    return '<span class="katex-error">[公式错误: '+formula+']</span>';
+  }
+}
+
+function extractMath(text) {
+  const blocks = [];
+  let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_,f) => {
+    const t = f.trim(); if (!t) return '';
+    blocks.push({ formula: t, display: true });
+    return '<!--MATH_BLOCK_'+(blocks.length-1)+'-->';
+  });
+  processed = processed.replace(/(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g, (_,f) => {
+    const t = f.trim(); if (!t) return '';
+    blocks.push({ formula: t, display: false });
+    return '<!--MATH_INLINE_'+(blocks.length-1)+'-->';
+  });
+  return { processed, blocks };
+}
+
+function renderMarkdown(text) {
+  if (!text) return '';
+  try {
+    const segments = [];
+    let remaining = text;
+    while (remaining.length > 0) {
+      const fm = remaining.match(/^```[\s\S]*?^```/m);
+      if (fm && fm.index !== undefined) {
+        if (fm.index > 0) segments.push({ type: 'text', content: remaining.slice(0, fm.index) });
+        segments.push({ type: 'code', content: fm[0] });
+        remaining = remaining.slice(fm.index + fm[0].length);
+      } else {
+        segments.push({ type: 'text', content: remaining });
+        remaining = '';
+      }
+    }
+    const allBlocks = [];
+    const processedSegs = segments.map(seg => {
+      if (seg.type === 'code') return seg.content;
+      const { processed, blocks } = extractMath(seg.content);
+      allBlocks.push(...blocks);
+      return processed;
+    });
+    let html = marked.parse(processedSegs.join(''));
+    for (let i = 0; i < allBlocks.length; i++) {
+      const { formula, display } = allBlocks[i];
+      const ph = display ? '<!--MATH_BLOCK_'+i+'-->' : '<!--MATH_INLINE_'+i+'-->';
+      const rendered = katexRender(formula, display);
+      html = html.replace(ph, display ? '<div class="katex-display">'+rendered+'</div>' : rendered);
+    }
+    return html;
+  } catch(e) {
+    console.error('Markdown render error:', e);
+    return text;
+  }
+}
+
+// ==================== Utils ====================
+function getTodayStr() { return new Date().toISOString().slice(0,10); }
+function fmtDate(ds) {
+  const d = new Date(ds);
+  const wd = ['日','一','二','三','四','五','六'];
+  return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 周'+wd[d.getDay()];
+}
+function genId() { return Date.now().toString(36)+Math.random().toString(36).slice(2,9); }
+
+const DIFF_MAP = {
+  0:{label:'未设置',color:'#b0b0b0'}, 1:{label:'红',color:'#ff4d4d'},
+  2:{label:'橙',color:'#ff8c00'}, 3:{label:'黄',color:'#ffd700'},
+  4:{label:'绿',color:'#00cc66'}, 5:{label:'青',color:'#00bfff'},
+  6:{label:'蓝',color:'#3366ff'}, 7:{label:'紫',color:'#9966ff'}
+};
+
+function parseTrick(text) {
+  const lines = text.split('\n');
+  const tl = lines.find(l=>l.trim().startsWith('###'));
+  const title = tl ? tl.replace(/^###\s*/,'').trim() : '未命名Trick';
+  const desc = lines.filter(l=>!l.trim().startsWith('###')).join('\n').trim();
+  return {title,description:desc};
+}
+
+function parseKnowledge(text) {
+  const lines = text.split('\n');
+  const tl = lines.find(l=>l.trim().startsWith('###'));
+  const title = tl ? tl.replace(/^###\s*/,'').trim() : '未命名知识点';
+  const cm = text.match(/```[\s\S]*?```/);
+  const code = cm ? cm[0] : undefined;
+  const rest = lines.filter(l=>!l.trim().startsWith('###')&&!l.includes('```'));
+  const kp = [], ci = [];
+  for (const l of rest) {
+    if (l.trim().startsWith('-')) kp.push(l.trim().replace(/^-\s*/,''));
+    else if (l.trim()) ci.push(l.trim());
+  }
+  return {title,coreIdea:ci.join(' ').trim(),code,keyPoints:kp};
+}
+
+function buildSearchIndex(data) {
+  const items = [];
+  for (const [date, day] of Object.entries(data)) {
+    for (const pid of day.diary) items.push({ date, type: 'diary', id: pid, title: pid, preview: '日记: '+pid });
+    for (const t of day.tricks) items.push({ date, type: 'trick', id: t.id, title: t.title, preview: t.description.slice(0,60) });
+    for (const p of day.problems) items.push({ date, type: 'problem', id: p.id, title: p.id, preview: p.overview+' | '+p.idea });
+    for (const k of day.knowledge) items.push({ date, type: 'knowledge', id: k.id, title: k.title, preview: k.coreIdea.slice(0,60) });
+  }
+  return new Fuse(items, { keys: ['title','preview'], threshold: 0.3, includeScore: true });
+}
+
+// ==================== Vue App ====================
+const app = Vue.createApp({
+  data() {
+    return {
+      // File
+      fileReady: false,
+      fileHandle: null,
+      selectingFile: false,
+      fileStatus: '',
+      fileError: '',
+
+      // Data
+      data: {},
+      loading: false,
+      saveOk: false,
+      saveTimer: null,
+      saveError: null,
+
+      // UI
+      sidebarOpen: false,
+      currentDate: getTodayStr(),
+      currentModule: 'diary',
+      currentView: 'home',
+      fontSize: parseInt(localStorage.getItem('fontSize')||'16'),
+
+      // Sidebar editing
+      editingDate: null,
+      editDateVal: '',
+
+      // Search
+      searchQ: '',
+      suggestions: [],
+      searchResults: [],
+      fuseInstance: null,
+
+      // Import modal
+      importOpen: false,
+      importTargetDate: '',
+      importType: 'diary',
+      impDiary: '', impTrickTitle: '', impTrickDesc: '',
+      impProbId: '', impProbDiff: 0, impProbOverview: '', impProbIdea: '', impProbGain: '',
+      impKnowTitle: '', impKnowCore: '', impKnowCode: '', impKnowKP: '',
+    };
+  },
+
+  computed: {
+    sortedDates() { return Object.keys(this.data).sort((a,b)=>b.localeCompare(a)); },
+    dayData() { return this.data[this.currentDate] || null; },
+    tabs() { return [{key:'diary',label:'日记'},{key:'tricks',label:'Tricks'},{key:'problems',label:'思路速览'},{key:'knowledge',label:'知识点'}]; },
+    importTypes() { return [{key:'diary',label:'日记'},{key:'trick',label:'Trick'},{key:'problem',label:'题目'},{key:'knowledge',label:'知识点'}]; },
+    diffs() { return Object.entries(DIFF_MAP).map(([v,{label}])=>({v:Number(v),l:label})); }
+  },
+
+  watch: {
+    fontSize(val) {
+      document.documentElement.style.setProperty('--content-font-size', val+'px');
+      localStorage.setItem('fontSize', String(val));
+    }
+  },
+
+  async mounted() {
+    document.documentElement.style.setProperty('--content-font-size', this.fontSize+'px');
+    // Try to restore file handle from IndexedDB
+    const handle = await getStoredHandle();
+    if (handle) {
+      try {
+        // Check if we still have permission
+        const opts = { mode: 'readwrite' };
+        if ((await handle.queryPermission(opts)) === 'granted' || (await handle.requestPermission(opts)) === 'granted') {
+          this.fileHandle = handle;
+          this.fileReady = true;
+          this.fileStatus = '已自动加载数据文件';
+          await this.loadFromFile();
+          return;
+        }
+      } catch { /* need to re-select */ }
+    }
+    // If we get here, we need user to select the file
+    // Don't auto-show picker, let user click button
+  },
+
+  methods: {
+    // ===== File Selection =====
+    async selectFile() {
+      this.selectingFile = true;
+      this.fileError = '';
+      this.fileStatus = '';
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+          multiple: false
+        });
+        // Verify permission
+        if ((await handle.requestPermission({ mode: 'readwrite' })) !== 'granted') {
+          this.fileError = '需要读写权限才能使用此工具';
+          this.selectingFile = false;
+          return;
+        }
+        this.fileHandle = handle;
+        await storeHandle(handle);
+        this.fileStatus = '文件已关联，加载中...';
+        await this.loadFromFile();
+        this.fileReady = true;
+        this.fileStatus = '数据加载成功';
+      } catch(e) {
+        if (e.name === 'AbortError') {
+          this.fileStatus = '已取消选择';
+        } else {
+          this.fileError = '选择文件失败: ' + (e.message || '未知错误');
+        }
+      } finally {
+        this.selectingFile = false;
+      }
+    },
+
+    async loadFromFile() {
+      this.loading = true;
+      try {
+        this.data = await readLocalFile(this.fileHandle);
+      } catch(e) {
+        console.error('Load error:', e);
+        this.data = {};
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async save() {
+      if (!this.fileHandle) return;
+      this.saveError = null;
+      try {
+        await writeLocalFile(this.fileHandle, this.data);
+        this.saveOk = true;
+        clearTimeout(this.saveTimer);
+        this.saveTimer = setTimeout(() => { this.saveOk = false; }, 1200);
+      } catch(e) {
+        console.error('Save error:', e);
+        // 尝试恢复：先验证文件句柄是否仍然有效
+        try {
+          const file = await this.fileHandle.getFile();
+          // 文件存在但写入失败，尝试重新请求权限后重试
+          const opts = { mode: 'readwrite' };
+          if ((await this.fileHandle.requestPermission(opts)) === 'granted') {
+            try {
+              await writeLocalFile(this.fileHandle, this.data);
+              this.saveOk = true;
+              clearTimeout(this.saveTimer);
+              this.saveTimer = setTimeout(() => { this.saveOk = false; }, 1200);
+              return;
+            } catch(e2) {
+              console.error('Retry save error:', e2);
+              this.saveError = e2.message || '保存失败';
+            }
+          } else {
+            this.saveError = '权限不足，请重新选择文件';
+            this.fileReady = false;
+            this.fileHandle = null;
+          }
+        } catch {
+          // 文件句柄失效（文件被移动或删除）
+          this.saveError = '数据文件已移动或删除，请重新选择文件';
+          this.fileReady = false;
+          this.fileHandle = null;
+        }
+      }
+    },
+
+    // ===== Sidebar =====
+    selectDate(date) { this.currentDate = date; this.currentView = 'home'; this.sidebarOpen = false; },
+    startEditDate(date) {
+      this.editingDate = date; this.editDateVal = date;
+      this.$nextTick(() => { const refs = this.$refs.editRef; if (refs) (Array.isArray(refs)?refs[refs.length-1]:refs).focus(); });
+    },
+    saveDateEdit(oldDate) {
+      if (!this.editingDate) return;
+      const nd = this.editDateVal;
+      if (nd && nd !== oldDate) {
+        if (this.data[nd]) {
+          if (!confirm(nd+' 已存在，是否合并数据？')) { this.editingDate=null; return; }
+          const o = this.data[oldDate], n = this.data[nd];
+          n.diary = [...o.diary, ...n.diary]; n.tricks = [...o.tricks, ...n.tricks];
+          n.problems = [...o.problems, ...n.problems]; n.knowledge = [...o.knowledge, ...n.knowledge];
+        } else { this.data[nd] = {...this.data[oldDate], date: nd}; }
+        delete this.data[oldDate];
+        if (this.currentDate === oldDate) this.currentDate = nd;
+        this.save();
+      }
+      this.editingDate = null;
+    },
+    deleteDay(date) { if (confirm('确认删除 '+date+' 的所有数据？')) { delete this.data[date]; this.save(); } },
+    createNewDay() {
+      const today = getTodayStr();
+      if (!this.data[today]) { this.data[today] = { date: today, diary: [], tricks: [], problems: [], knowledge: [] }; this.save(); }
+      this.currentDate = today; this.sidebarOpen = false;
+    },
+
+    // ===== Diary =====
+    deleteDiaryItem(pid) {
+      if (confirm('删除题号 '+pid+'？')) { const day = this.data[this.currentDate]; if (day) day.diary = day.diary.filter(d=>d!==pid); this.save(); }
+    },
+
+    // ===== Trick =====
+    startEditTrick(t) { t._editing = true; t._efTitle = t.title; t._efDesc = t.description; },
+    cancelEditTrick(t) { t._editing = false; },
+    saveEditTrick(t) { t.title = t._efTitle; t.description = t._efDesc; t._editing = false; this.save(); },
+    deleteTrick(id) { if (confirm('删除 Trick？')) { const day = this.data[this.currentDate]; if (day) day.tricks = day.tricks.filter(t=>t.id!==id); this.save(); } },
+
+    // ===== Problem =====
+    startEditProblem(p) { p._editing = true; p._efOverview = p.overview; p._efIdea = p.idea; p._efGain = p.gain||''; p._efDifficulty = p.difficulty; },
+    cancelEditProblem(p) { p._editing = false; },
+    saveEditProblem(p) { p.overview = p._efOverview; p.idea = p._efIdea; p.gain = p._efGain||undefined; p.difficulty = p._efDifficulty; p._editing = false; this.save(); },
+    deleteProblem(id) {
+      if (confirm('删除题目 '+id+'？')) { const day = this.data[this.currentDate]; if (day) { day.problems = day.problems.filter(p=>p.id!==id); day.diary = day.diary.filter(d=>d!==id); } this.save(); }
+    },
+
+    // ===== Knowledge =====
+    startEditKnowledge(k) { k._editing = true; k._efTitle = k.title; k._efCoreIdea = k.coreIdea; k._efCode = k.code||''; k._efKeyPoints = (k.keyPoints||[]).map(kp=>'- '+kp).join('\n'); },
+    cancelEditKnowledge(k) { k._editing = false; },
+    saveEditKnowledge(k) {
+      k.title = k._efTitle; k.coreIdea = k._efCoreIdea; k.code = k._efCode||undefined;
+      k.keyPoints = k._efKeyPoints.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean);
+      k._editing = false; this.save();
+    },
+    deleteKnowledge(id) { if (confirm('删除知识点？')) { const day = this.data[this.currentDate]; if (day) day.knowledge = day.knowledge.filter(k=>k.id!==id); this.save(); } },
+
+    // ===== Search =====
+    typeLabel(t) { const m = {diary:'日记',trick:'Trick',problem:'题目',knowledge:'知识点'}; return m[t]||t; },
+    onSearchInput() {
+      const q = this.searchQ.trim(); if (!q) { this.suggestions = []; return; }
+      if (!this.fuseInstance) this.fuseInstance = buildSearchIndex(this.data);
+      this.suggestions = this.fuseInstance.search(q).slice(0,6).map(r=>r.item);
+    },
+    goSearch() {
+      if (!this.searchQ.trim()) return;
+      this.currentView = 'search';
+      if (!this.fuseInstance) this.fuseInstance = buildSearchIndex(this.data);
+      this.searchResults = this.fuseInstance.search(this.searchQ).slice(0,30).map(r=>r.item);
+      this.suggestions = [];
+    },
+    goSuggestion(item) {
+      this.suggestions = []; this.searchQ = ''; this.currentView = 'home';
+      this.currentDate = item.date;
+      const mm = {diary:'diary',trick:'tricks',problem:'problems',knowledge:'knowledge'};
+      this.currentModule = mm[item.type]||'diary';
+    },
+
+    // ===== Import =====
+    openImport(date) { this.importTargetDate = date; this.importOpen = true; this.sidebarOpen = false; },
+    doImport() {
+      const date = this.importTargetDate;
+      if (!this.data[date]) this.data[date] = { date, diary: [], tricks: [], problems: [], knowledge: [] };
+      switch (this.importType) {
+        case 'diary': {
+          if (!this.impDiary.trim()) return;
+          this.data[date].diary = [...this.impDiary.split('\n').map(s=>s.trim()).filter(Boolean), ...this.data[date].diary];
+          this.impDiary = ''; break;
+        }
+        case 'trick': {
+          if (!this.impTrickTitle.trim() && !this.impTrickDesc.trim()) return;
+          const parsed = parseTrick('### '+(this.impTrickTitle||'未命名Trick')+'\n'+this.impTrickDesc);
+          this.data[date].tricks = [{...parsed, id: genId(), createdAt: Date.now()}, ...this.data[date].tricks];
+          this.impTrickTitle = ''; this.impTrickDesc = ''; break;
+        }
+        case 'problem': {
+          if (!this.impProbId.trim()) return;
+          this.data[date].problems = [{id:this.impProbId.trim(),difficulty:this.impProbDiff,overview:this.impProbOverview.trim(),idea:this.impProbIdea.trim(),gain:this.impProbGain.trim()||undefined,createdAt:Date.now()}, ...this.data[date].problems];
+          if (!this.data[date].diary.includes(this.impProbId.trim())) this.data[date].diary = [this.impProbId.trim(), ...this.data[date].diary];
+          this.impProbId = ''; this.impProbDiff = 0; this.impProbOverview = ''; this.impProbIdea = ''; this.impProbGain = ''; break;
+        }
+        case 'knowledge': {
+          if (!this.impKnowTitle.trim()) return;
+          const kp = this.impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean);
+          const parts = ['### '+this.impKnowTitle];
+          if (this.impKnowCore.trim()) parts.push(this.impKnowCore.trim());
+          if (this.impKnowCode.trim()) parts.push(this.impKnowCode.trim());
+          if (kp.length>0) parts.push(kp.map(k=>'- '+k).join('\n'));
+          const parsed = parseKnowledge(parts.join('\n'));
+          this.data[date].knowledge = [{...parsed, id: genId(), createdAt: Date.now()}, ...this.data[date].knowledge];
+          this.impKnowTitle = ''; this.impKnowCore = ''; this.impKnowCode = ''; this.impKnowKP = ''; break;
+        }
+      }
+      this.importOpen = false; this.save();
+    },
+
+    // ===== Helpers =====
+    diffColor(d) { return (DIFF_MAP[d]||DIFF_MAP[0]).color; },
+    diffLabel(d) { return (DIFF_MAP[d]||DIFF_MAP[0]).label; },
+    renderMD: renderMarkdown,
+    onFontSize(e) { this.fontSize = parseInt(e.target.value); },
+    fmtDate,
+
+    // ===== Export/Import =====
+    exportData() {
+      const json = JSON.stringify(this.data, null, 2);
+      const blob = new Blob([json], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = 'oj-notes-backup-'+new Date().toISOString().slice(0,10)+'.json';
+      a.click(); URL.revokeObjectURL(url);
+    },
+    triggerImport() {
+      const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { try { this.data = JSON.parse(reader.result); this.save(); alert('导入成功！'); } catch { alert('导入失败：文件格式不正确'); } };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+  }
+});
+
+app.mount('#app');
+</script>
+</body>
+</html>
