@@ -1030,6 +1030,16 @@ const app = Vue.createApp({
     onFontSize(e) { this.fontSize = parseInt(e.target.value); },
     fmtDate,
 
+    // ===== Re-select file =====
+    async reselectFile() {
+      this.saveError = null;
+      this.fileReady = false;
+      this.fileHandle = null;
+      this.selectingFile = false;
+      this.fileStatus = '';
+      this.fileError = '';
+    },
+
     // ===== Export/Import =====
     exportData() {
       const json = JSON.stringify(this.data, null, 2);
