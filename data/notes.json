@@ -47,7 +47,7 @@
     "problems": [
       {
         "id": "P3919",
-        "difficulty": 0,
+        "difficulty": 6,
         "overview": "维护可持久化数组，支持基于历史版本的单点修改与单点查询，每次操作生成新版本。",
         "idea": "可持久化线段树模板，动态开点复制修改路径，根数组存版本入口。",
         "gain": "版本本质是根指针，查询时直接复制根不产生新节点。",
@@ -56,47 +56,72 @@
         "_efOverview": "维护可持久化数组，支持基于历史版本的单点修改与单点查询，每次操作生成新版本。",
         "_efIdea": "可持久化线段树模板，动态开点复制修改路径，根数组存版本入口。",
         "_efGain": "版本本质是根指针，查询时直接复制根不产生新节点。",
-        "_efDifficulty": 0
+        "_efDifficulty": 6
       },
       {
         "id": "ABC453G",
-        "difficulty": 0,
+        "difficulty": 5,
         "overview": "维护多个初始为0的序列，支持序列整体复制、单点修改、区间求和。",
         "idea": "同 P3919，查询操作直接 `root[i] = root[v]` 。",
         "gain": "可持久化数组查询操作仅复制根，不新增节点。",
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_editing": false,
+        "_efOverview": "维护多个初始为0的序列，支持序列整体复制、单点修改、区间求和。",
+        "_efIdea": "同 P3919，查询操作直接 `root[i] = root[v]` 。",
+        "_efGain": "可持久化数组查询操作仅复制根，不新增节点。",
+        "_efDifficulty": 5
       },
       {
         "id": "P3834",
-        "difficulty": 0,
+        "difficulty": 6,
         "overview": "给定静态序列，多次查询区间第k小值。",
         "idea": "主席树，按原数组下标建立权值线段树的前缀版本，查询时两个版本相减得到区间频数，树上二分找第 $k$ 小。",
         "gain": "前缀和思想可应用于权值线段树实现区间可减性。",
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_editing": false,
+        "_efOverview": "给定静态序列，多次查询区间第k小值。",
+        "_efIdea": "主席树，按原数组下标建立权值线段树的前缀版本，查询时两个版本相减得到区间频数，树上二分找第 $k$ 小。",
+        "_efGain": "前缀和思想可应用于权值线段树实现区间可减性。",
+        "_efDifficulty": 6
       },
       {
         "id": "CF707D",
-        "difficulty": 0,
+        "difficulty": 5,
         "overview": "n行m列的01书架，支持单点放/取书、整行翻转、回退到历史版本，每次操作后输出总书数。",
         "idea": "二维矩阵压成一维，每行末尾加标记点记录行翻转标记，单点实际值 = 存储值异或标记，整行翻转只改标记点，配合可持久化线段树维护多版本。",
         "gain": "利用**自反性**将批量行操作坍缩为单点标记修改。我们需要善用懒标记思想和二维拆一维，以及自反性的利用。",
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_editing": false,
+        "_efOverview": "n行m列的01书架，支持单点放/取书、整行翻转、回退到历史版本，每次操作后输出总书数。",
+        "_efIdea": "二维矩阵压成一维，每行末尾加标记点记录行翻转标记，单点实际值 = 存储值异或标记，整行翻转只改标记点，配合可持久化线段树维护多版本。",
+        "_efGain": "利用**自反性**将批量行操作坍缩为单点标记修改。我们需要善用懒标记思想和二维拆一维，以及自反性的利用。",
+        "_efDifficulty": 5
       },
       {
         "id": "P3567",
-        "difficulty": 0,
+        "difficulty": 5,
         "overview": "多次查询区间内是否存在出现次数严格超区间长度一半的数，存在则输出该数，否则输出0。",
         "idea": "主席树查询区间绝对众数，查询时树上二分优先进入频数超过 $len/2$ 的子树，否则返回 $0$ 。",
         "gain": "绝对众数若存在必在某侧子树过半，可剪枝定位。",
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_editing": false,
+        "_efOverview": "多次查询区间内是否存在出现次数严格超区间长度一半的数，存在则输出该数，否则输出0。",
+        "_efIdea": "主席树查询区间绝对众数，查询时树上二分优先进入频数超过 $len/2$ 的子树，否则返回 $0$ 。",
+        "_efGain": "绝对众数若存在必在某侧子树过半，可剪枝定位。",
+        "_efDifficulty": 5
       },
       {
         "id": "ABC339G",
-        "difficulty": 0,
+        "difficulty": 5,
         "overview": "给定静态序列，在线查询区间内不大于x的所有数的总和。",
         "idea": "主席树维护值域数字和，查询区间内 $\\le x$ 的数之和。",
         "gain": "主席树节点不仅可存个数，也可存储权值和。",
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_editing": false,
+        "_efOverview": "给定静态序列，在线查询区间内不大于x的所有数的总和。",
+        "_efIdea": "主席树维护值域数字和，查询区间内 $\\le x$ 的数之和。",
+        "_efGain": "主席树节点不仅可存个数，也可存储权值和。",
+        "_efDifficulty": 5
       }
     ],
     "knowledge": [
@@ -121,7 +146,8 @@
           "`upd` 沿路径累加 `sz`",
           "查询时两个版本相减得到区间统计，`cnt` 决定走向"
         ],
-        "createdAt": 1720108800000
+        "createdAt": 1720108800000,
+        "_codeExpanded": false
       }
     ]
   },
@@ -168,11 +194,16 @@
     "problems": [
       {
         "id": "AGC024B",
-        "difficulty": 0,
+        "difficulty": 3,
         "overview": "给定1~n的排列，每次可将任意元素移到开头或末尾，求使序列升序的最少操作次数。",
         "idea": "每次可将任意元素移至开头或末尾，最小操作数 = $n - $ 最长连续递增子序列长度（数值严格 $+1$ ）。",
         "gain": "反向思考，保留无需移动的最大连续段，利用排列连续性扫描即可。",
-        "createdAt": 1720454400000
+        "createdAt": 1720454400000,
+        "_editing": false,
+        "_efOverview": "给定1~n的排列，每次可将任意元素移到开头或末尾，求使序列升序的最少操作次数。",
+        "_efIdea": "每次可将任意元素移至开头或末尾，最小操作数 = $n - $ 最长连续递增子序列长度（数值严格 $+1$ ）。",
+        "_efGain": "反向思考，保留无需移动的最大连续段，利用排列连续性扫描即可。",
+        "_efDifficulty": 3
       },
       {
         "id": "ABC170F",
@@ -180,7 +211,12 @@
         "overview": "网格图中四方向每次可连续走1~K步，遇障碍停止，求起点到终点的最少步数。",
         "idea": "BFS 四方向每次走 $1 \\sim K$ 步，内层循环延伸时遇障碍直接 `break` ，遇已访问且步数 $\\le$ 当前步数的格子也直接 `break` 。",
         "gain": "利用 BFS 单调性剪掉整条射线冗余延伸，使理论复杂在网格图上趋近 $O(NM)$ 。搜索题一定要考虑疯狂优化的思路。",
-        "createdAt": 1720454400000
+        "createdAt": 1720454400000,
+        "_editing": false,
+        "_efOverview": "网格图中四方向每次可连续走1~K步，遇障碍停止，求起点到终点的最少步数。",
+        "_efIdea": "BFS 四方向每次走 $1 \\sim K$ 步，内层循环延伸时遇障碍直接 `break` ，遇已访问且步数 $\\le$ 当前步数的格子也直接 `break` 。",
+        "_efGain": "利用 BFS 单调性剪掉整条射线冗余延伸，使理论复杂在网格图上趋近 $O(NM)$ 。搜索题一定要考虑疯狂优化的思路。",
+        "_efDifficulty": 0
       },
       {
         "id": "CF372C",
@@ -330,19 +366,29 @@
     "problems": [
       {
         "id": "U592193",
-        "difficulty": 0,
+        "difficulty": 4,
         "overview": "给定两个仅含小写字母的字符串 $A$（$|A|\\le 10^6$）和 $B$（$|B|\\le 1000$），求它们的最长公共子序列长度。",
         "idea": "核心矛盾是传统 $dp[i][j]$ 状态数 $O(|A|\\cdot|B|)$ 不可行，解法采用状态与值互换，将 LCS 长度作为状态，$dp[j][len]$ 表示用 $B$ 的前 $j$ 个字符匹配长度为 $len$ 的子序列时，在 $A$ 中结束的最早位置；为 $A$ 建立序列自动机 $nxt[i][c]$ 实现 $O(1)$ 跳转；转移方程为 $dp[j][len] = \\min(dp[j-1][len],\\ nxt[dp[j-1][len-1]][B[j]])$，并用滚动数组优化；复杂度 $O(26|A| + |B|^2)$，完美适配数据不均匀的特点。",
         "gain": "将“最大长度”与“最小结束位置”互换，把 DP 状态定义在短串上，用长度枚举替代位置枚举，从而将复杂度从 $O(nm)$ 降为 $O(m^2)$。",
-        "createdAt": 1720627200000
+        "createdAt": 1720627200000,
+        "_editing": false,
+        "_efOverview": "给定两个仅含小写字母的字符串 $A$（$|A|\\le 10^6$）和 $B$（$|B|\\le 1000$），求它们的最长公共子序列长度。",
+        "_efIdea": "核心矛盾是传统 $dp[i][j]$ 状态数 $O(|A|\\cdot|B|)$ 不可行，解法采用状态与值互换，将 LCS 长度作为状态，$dp[j][len]$ 表示用 $B$ 的前 $j$ 个字符匹配长度为 $len$ 的子序列时，在 $A$ 中结束的最早位置；为 $A$ 建立序列自动机 $nxt[i][c]$ 实现 $O(1)$ 跳转；转移方程为 $dp[j][len] = \\min(dp[j-1][len],\\ nxt[dp[j-1][len-1]][B[j]])$，并用滚动数组优化；复杂度 $O(26|A| + |B|^2)$，完美适配数据不均匀的特点。",
+        "_efGain": "将“最大长度”与“最小结束位置”互换，把 DP 状态定义在短串上，用长度枚举替代位置枚举，从而将复杂度从 $O(nm)$ 降为 $O(m^2)$。",
+        "_efDifficulty": 4
       },
       {
         "id": "Gym492178ZK",
-        "difficulty": 0,
+        "difficulty": 4,
         "overview": "给定 $n \\le 3000$ 个点、$m \\le 6000$ 条边的无向图，求本质不同的最小环个数。",
         "idea": "枚举每条边并暂时断开，用 BFS 求两端点间最短路径及条数来拼成最小环，最后除以环长去重。",
         "gain": "“破环为链”把找环问题降维成最短路计数，并需根据统计方式用环长做除法去重。",
-        "createdAt": 1720627200000
+        "createdAt": 1720627200000,
+        "_editing": false,
+        "_efOverview": "给定 $n \\le 3000$ 个点、$m \\le 6000$ 条边的无向图，求本质不同的最小环个数。",
+        "_efIdea": "枚举每条边并暂时断开，用 BFS 求两端点间最短路径及条数来拼成最小环，最后除以环长去重。",
+        "_efGain": "“破环为链”把找环问题降维成最短路计数，并需根据统计方式用环长做除法去重。",
+        "_efDifficulty": 4
       }
     ],
     "knowledge": [
@@ -394,11 +440,16 @@
     "problems": [
       {
         "id": "ABC466E",
-        "difficulty": 0,
+        "difficulty": 4,
         "overview": "有 $N$ 张卡片排成一排，第 $i$ 张卡片正面写着 $A_i$，背面写着 $B_i$。初始所有卡片正面朝上。最多执行 $K$ 次操作，每次选择区间 $[l,r]$ 翻转区间内所有卡片。求操作后朝上一面数字之和的最大值。",
         "idea": "**问题转化**：每张卡片若被翻转奇数次，贡献从 $A_i$ 变为 $B_i$，增量为 $w_i = B_i - A_i$；翻转偶数次增量 $0$。$K$ 次区间翻转后，被翻转的位置形成**至多 $K$ 个连续段**。于是问题等价于：选出至多 $K$ 个不重叠区间，最大化区间内 $w_i$ 之和，答案 = $\\sum A_i +$ 最大增量。\n\n**DP 设计**：$dp[j][0/1]$ 表示处理完当前前缀，用了 $j$ 次操作，且当前第 $i$ 张卡片**不在/在**翻转区间内的最大增量。\n\n**转移**（$w_i = B_i - A_i$）：\n- $dp2[j][0] = \\max(dp[j][0], dp[j][1])$（第 $i$ 位不翻转，前一位在或不在区间均可）；\n- $dp2[j][1] = \\max(dp[j][1], dp[j-1][0]) + w_i$（延续区间 或 开始新区间）。\n\n最终答案 = $\\sum A_i + \\max_{0 \\le j \\le K} \\max(dp[j][0], dp[j][1])$。",
         "gain": "区间翻转问题转化为“选至多 K 个不重叠区间”的经典模型，核心是用 $0/1$ 状态刻画“是否在翻转区间内”，将区间操作的空间连续性转化为 DP 扫描的时间连续性。同时掌握了增量转化（先算 $\\sum A_i$ 再 DP 增量）和滚动数组优化空间的技巧。",
-        "createdAt": 1720800000000
+        "createdAt": 1720800000000,
+        "_editing": false,
+        "_efOverview": "有 $N$ 张卡片排成一排，第 $i$ 张卡片正面写着 $A_i$，背面写着 $B_i$。初始所有卡片正面朝上。最多执行 $K$ 次操作，每次选择区间 $[l,r]$ 翻转区间内所有卡片。求操作后朝上一面数字之和的最大值。",
+        "_efIdea": "**问题转化**：每张卡片若被翻转奇数次，贡献从 $A_i$ 变为 $B_i$，增量为 $w_i = B_i - A_i$；翻转偶数次增量 $0$。$K$ 次区间翻转后，被翻转的位置形成**至多 $K$ 个连续段**。于是问题等价于：选出至多 $K$ 个不重叠区间，最大化区间内 $w_i$ 之和，答案 = $\\sum A_i +$ 最大增量。\n\n**DP 设计**：$dp[j][0/1]$ 表示处理完当前前缀，用了 $j$ 次操作，且当前第 $i$ 张卡片**不在/在**翻转区间内的最大增量。\n\n**转移**（$w_i = B_i - A_i$）：\n- $dp2[j][0] = \\max(dp[j][0], dp[j][1])$（第 $i$ 位不翻转，前一位在或不在区间均可）；\n- $dp2[j][1] = \\max(dp[j][1], dp[j-1][0]) + w_i$（延续区间 或 开始新区间）。\n\n最终答案 = $\\sum A_i + \\max_{0 \\le j \\le K} \\max(dp[j][0], dp[j][1])$。",
+        "_efGain": "区间翻转问题转化为“选至多 K 个不重叠区间”的经典模型，核心是用 $0/1$ 状态刻画“是否在翻转区间内”，将区间操作的空间连续性转化为 DP 扫描的时间连续性。同时掌握了增量转化（先算 $\\sum A_i$ 再 DP 增量）和滚动数组优化空间的技巧。",
+        "_efDifficulty": 4
       }
     ],
     "knowledge": []
@@ -406,7 +457,14 @@
   "2026-07-13": {
     "date": "2026-07-13",
     "diary": [],
-    "tricks": [],
+    "tricks": [
+      {
+        "title": "超级源点的发现",
+        "description": "当我们拥有森林、多个地位相等的起点时候，考虑超级源点",
+        "id": "mrkquvsypqi4fss",
+        "createdAt": 1784039167618
+      }
+    ],
     "problems": [],
     "knowledge": []
   },
@@ -417,7 +475,26 @@
       "P1471",
       "P2894"
     ],
-    "tricks": [],
+    "tricks": [
+      {
+        "title": "懒标记设计核心：自包含性",
+        "description": "懒标记必须携带足够信息，使得当前节点在不访问子节点的情况下，能独立计算出该区间所有需要维护的统计值。  \n数学表达：节点存储答案 $ans$，标记 $tag$ 描述“整体状态”（如全 $0$ / 全 $1$ / 无覆盖/全部加 $k$ ）。下传时直接覆盖子节点全部字段，无需合并子区间信息。  \n通用场景：所有区间整体赋值、整体修改的线段树问题，确保标记封闭、信息完整，避免因依赖子节点导致标记失效或反复下传。",
+        "id": "mrksy25c2kyu2nr",
+        "createdAt": 1784042675040
+      },
+      {
+        "title": "维护方法不明显内容的处理",
+        "description": "我们找到难以更新的那部分，分成两部分：查询的内容和发生更新的时候。我们列出查询时的式子进行展开、整理，得出需要维护的内容；把展开后的式子，得出更新前后展开后的式子，整理成维护信息可以计算的形式即可。",
+        "id": "mrksoe2ui1dg6yt",
+        "createdAt": 1784042223942
+      },
+      {
+        "title": "括号匹配类型的识别",
+        "description": "看到大量左右、LR的关系，考虑括号匹配类思想",
+        "id": "mrkqs0tzb386xii",
+        "createdAt": 1784039034167
+      }
+    ],
     "problems": [
       {
         "id": "P2894",
@@ -442,6 +519,232 @@
         "idea": "用栈维护向右（R）的粒子，遇到向左（L）的粒子时弹栈匹配最近的R，碰撞时间取 $\\frac{x_L - x_R}{2}$ 的最小值，匹配后弹栈，无匹配输出 $-1$。",
         "gain": "看到左右、LR，考虑**括号相关**",
         "createdAt": 1784025851392
+      }
+    ],
+    "knowledge": []
+  },
+  "2026-07-15": {
+    "date": "2026-07-15",
+    "diary": [
+      "P6327"
+    ],
+    "tricks": [],
+    "problems": [
+      {
+        "id": "P6327",
+        "difficulty": 5,
+        "overview": "维护长度为 $n$ 的整数序列，支持两种操作：  \n1. `1 l r v`：将 $a_l \\sim a_r$ 每个数加上 $v$。  \n2. `2 l r`：查询 $\\sum_{i=l}^{r} \\sin(a_i)$，结果保留 $1$ 位小数。",
+        "idea": "核心：和角公式：\n$ \\sin(a + v) = \\sin(a) \\cos(v) + \\cos(a) \\sin(v) $  \n$ \\cos(a + v) = \\cos(a) \\cos(v) - \\sin(a) \\sin(v) $\n我们考虑要维护的内容以及懒标记设计。我们进行拆公式可得每次更新的计算公式，然后独立为一个函数，在更新函数和pushdown使用",
+        "createdAt": 1784213415657,
+        "_editing": false,
+        "_efOverview": "维护长度为 $n$ 的整数序列，支持两种操作：  \n1. `1 l r v`：将 $a_l \\sim a_r$ 每个数加上 $v$。  \n2. `2 l r`：查询 $\\sum_{i=l}^{r} \\sin(a_i)$，结果保留 $1$ 位小数。",
+        "_efIdea": "核心：和角公式：\n$ \\sin(a + v) = \\sin(a) \\cos(v) + \\cos(a) \\sin(v) $  \n$ \\cos(a + v) = \\cos(a) \\cos(v) - \\sin(a) \\sin(v) $\n我们考虑要维护的内容以及懒标记设计。我们进行拆公式可得每次更新的计算公式，然后独立为一个函数，在更新函数和pushdown使用",
+        "_efGain": "",
+        "_efDifficulty": 5
+      }
+    ],
+    "knowledge": []
+  },
+  "2026-07-16": {
+    "date": "2026-07-16",
+    "diary": [],
+    "tricks": [],
+    "problems": [],
+    "knowledge": []
+  },
+  "2026-07-17": {
+    "date": "2026-07-17",
+    "diary": [
+      "P3629",
+      "P4408",
+      "P2491",
+      "P2610",
+      "P5536",
+      "P5597",
+      "CF1919D",
+      "CF792D",
+      "P5018",
+      "P1229"
+    ],
+    "tricks": [
+      {
+        "title": "平面图ST最小割的处理方法",
+        "description": "**ST最小割定义**：在平面连通图中，切断若干条边使源点S与汇点T彻底分离，其中被切边总权值最小的方案就是平面S-T最小割。类比切蛋糕：S、T分处蛋糕两侧，最小割就是以最低代价切分蛋糕，让S和T各属一块。\n\n**处理方法**：通过对偶图转化求解：补一条S-T辅助边拆分外部面，将原图的面对应对偶图顶点、边对应对偶边；原问题等价于对偶图上S侧到T侧的最短路，用Dijkstra算法求解即可，仅适用于平面图，网格图是竞赛高频考察场景。",
+        "id": "mrrvihi89np3vs6",
+        "createdAt": 1784470250528,
+        "_editing": false,
+        "_efTitle": "平面图ST最小割的处理方法",
+        "_efDesc": "**ST最小割定义**：在平面连通图中，切断若干条边使源点S与汇点T彻底分离，其中被切边总权值最小的方案就是平面S-T最小割。类比切蛋糕：S、T分处蛋糕两侧，最小割就是以最低代价切分蛋糕，让S和T各属一块。\n\n**处理方法**：通过对偶图转化求解：补一条S-T辅助边拆分外部面，将原图的面对应对偶图顶点、边对应对偶边；原问题等价于对偶图上S侧到T侧的最短路，用Dijkstra算法求解即可，仅适用于平面图，网格图是竞赛高频考察场景。"
+      }
+    ],
+    "problems": [
+      {
+        "id": "P3629",
+        "difficulty": 7,
+        "overview": "给定一棵 $n$ 个节点的树，边权为 $1$。巡警车从 $1$ 号点出发，遍历所有边并回到 $1$ 号点，原始路程为 $2(n-1)$。允许新建 $K$ 条边（$K=1$ 或 $2$），每条新边必须恰好经过一次。求最优方案下的最小总巡逻距离。等价于在树上加 $K$ 条边，使从 $1$ 出发回到 $1$ 且覆盖所有边、每条新边恰好走一次的最短回路长度。",
+        "idea": "对于 $K=1$，答案为 $2(n-1) - D + 1$，$D$ 为直径长度，加一条边使直径上的边只需走一次。\n\n对于 $K=2$，标记第一条直径上的边，将树上边权设为：直径边权为 $-1$，其余边权为 $1$，然后求树的最长路径 $D'$，答案为 $2(n-1) - D - D' + 2$。其中 $D'$ 用树形 DP 求，边权处理保证两条新边对应的路径在树上边不相交时最大化节省。",
+        "gain": "核心收获是：当两个操作（如两条路径）产生重叠，且重叠部分不能重复贡献时，可以**将已被占用的部分设为负权值**（如 -1），其余部分设为正常权值（如 1），然后在新边权体系下用树形 DP 求带权最长路径，**算法因负权会自动避开重叠区域**，从而将复杂的“重叠约束”问题转化为简单的“带权最值”问题，核心思想是用代数惩罚替代逻辑判断，利用最优化过程的自动决策能力代替手动容斥。",
+        "createdAt": 1784476439628
+      },
+      {
+        "id": "P4408",
+        "difficulty": 5,
+        "overview": "给定一棵带权树，选择三个点 $A,B,C$。从 $C$ 出发，先到距 $C$ 较近的点，若找不到再去另一个点。求最坏情况下所需的最大时间。\n即选三个点最大化 $\\min(\\text{dis}(C,A), \\text{dis}(C,B)) + \\text{dis}(A,B)$。\n其中 $\\min$ 表示先去较近的点，$\\text{dis}(A,B)$ 是两目标点间距离，答案即该最大值。",
+        "idea": "非常简单：首先求出直径。然后暴力枚举每一个点，直接求最大值就可以了。因为最优方案中 $A$ 和 $B$ 必为树的直径两端点（否则将其替换为更远端点会使 $\\text{dis}(A,B)$ 增大且 $\\min$ 项不减小，结果不会变差），固定后枚举每个点作为 $C$，取 $\\min(\\text{dis}(C,A),\\text{dis}(C,B))$ 的最大值加上直径长度即为答案。",
+        "createdAt": 1784471191065
+      },
+      {
+        "id": "P2491",
+        "difficulty": 6,
+        "overview": "给定一棵带边权的树，选择一条长度不超过 $s$ 的路径（边权和 ≤ s），使得所有其他节点到这条路径的最大距离最小，输出这个最小值。",
+        "idea": "我们首先找到直径，计算直径的边长、前缀和以及每一个直径上的节点所挂着的那棵子树，上面不包含任何直径的点。接下来进行双指针，直接计算出到达直径两个端点的距离，以及整个区间中所挂的子数能到达的最远距离，求出最大值。在这一坨里面找到其中值最小的那个输出。使用双指针是因为当左端点固定时，右端点越长，答案绝对不会变劣。",
+        "createdAt": 1784468039796
+      },
+      {
+        "id": "P2610",
+        "difficulty": 4,
+        "overview": "给定一个凸 $n$ 边形的三角剖分（共 $n-2$ 个三角形，每个三角形视为一个城市）。选择一条连接多边形两个不相邻顶点的线段作为旅游路线，若某个三角形与线段至少有 2 个公共点，则该城市被经过。求最多能经过多少个城市。答案等价于三角剖分对偶图的直径节点数（对偶图中每个三角形为节点，共享边的三角形相邻）。",
+        "idea": "我们考虑这道题目剖分了平面图形，我们考虑对偶图，把所有相接的边编程点之间的边，剖出的三角形变成点，然后直接求直径。",
+        "createdAt": 1784466552817
+      },
+      {
+        "id": "P5536",
+        "difficulty": 4,
+        "overview": "给定一棵 $n$ 个节点的树，选择 $k$ 个节点作为核心城市，要求这 $k$ 个节点构成连通块。定义拥堵度为所有非核心城市到最近核心城市的距离的最大值，求最小可能的拥堵度。",
+        "idea": "我们找出直径，以直径中点为根，直径上每个点进行深搜，搜到直径点就返回，统计出每个直径节点能到的最大深度，递减排序，答案为第 ``k + 1`` 项。",
+        "createdAt": 1784461584681,
+        "_editing": false,
+        "_efOverview": "给定一棵 $n$ 个节点的树，选择 $k$ 个节点作为核心城市，要求这 $k$ 个节点构成连通块。定义拥堵度为所有非核心城市到最近核心城市的距离的最大值，求最小可能的拥堵度。",
+        "_efIdea": "我们找出直径，以直径中点为根，直径上每个点进行深搜，搜到直径点就返回，统计出每个直径节点能到的最大深度，递减排序，答案为第 ``k + 1`` 项。",
+        "_efGain": "",
+        "_efDifficulty": 4
+      },
+      {
+        "id": "P5597",
+        "difficulty": 7,
+        "overview": "### 题目概括\n\n给定一棵无限完全二叉树，已知一个包含根节点的大小为 $n$ 的连通块（其形态由前序遍历字符串给出），要求构造一个最短的由 `L`/`R`/`U` 组成的指令串 $s$，使得机器人从根出发，无限次重复执行 $s$ 的过程中能够经过该连通块的所有节点。输出最短指令串的长度。",
+        "idea": "**关键洞察**：最优指令串一定是根到某个宝藏节点的路径（`L/R` 序列），因为无限循环中每次起点都是根，非路径前缀必然浪费字符。  \n**做法**：DFS枚举所有根到节点的路径作为候选指令串 `rep`；对每个 `rep`，从根开始不断执行完整指令，用 `merge` 记录本轮经过的宝藏节点到一棵覆盖树，直到走到空节点为止；最终 `c[1].sz` 统计该指令能覆盖的节点数；若覆盖数等于总节点数，则用 `2*(覆盖树大小-1)-路径深度+1` 更新最短长度，输出 `ans+1`。",
+        "createdAt": 1784459709988
+      },
+      {
+        "id": "CF1919D",
+        "difficulty": 5,
+        "overview": "给定一个长度为 $n$ 的数组 $a$，表示一棵**完全二叉树**的所有叶子节点（按 DFS 顺序）到根节点的距离。每个非叶子节点有且仅有两个儿子，且连接两个儿子的两条边权值分别为 $0$ 和 $1$（顺序可交换）。判断是否存在这样一棵二叉树满足给定的叶子距离数组。",
+        "idea": "给定按 DFS 序排列的叶子深度数组 `a`，利用性质：任意兄弟子树深度差为 1，父节点深度等于较小值。从左到右扫描 `a`，用栈 `st` 维护未合并子树的深度，每压入新深度后，循环检查栈顶两数若 `abs` 差为 1 则弹出并压入 `min`（模拟合并为父节点），继续检查直至无法合并。扫描完若 `st` 只剩 `[0]` 则合法，否则不合法。",
+        "createdAt": 1784438954489,
+        "_editing": false,
+        "_efOverview": "给定一个长度为 $n$ 的数组 $a$，表示一棵**完全二叉树**的所有叶子节点（按 DFS 顺序）到根节点的距离。每个非叶子节点有且仅有两个儿子，且连接两个儿子的两条边权值分别为 $0$ 和 $1$（顺序可交换）。判断是否存在这样一棵二叉树满足给定的叶子距离数组。",
+        "_efIdea": "给定按 DFS 序排列的叶子深度数组 `a`，利用性质：任意兄弟子树深度差为 1，父节点深度等于较小值。从左到右扫描 `a`，用栈 `st` 维护未合并子树的深度，每压入新深度后，循环检查栈顶两数若 `abs` 差为 1 则弹出并压入 `min`（模拟合并为父节点），继续检查直至无法合并。扫描完若 `st` 只剩 `[0]` 则合法，否则不合法。",
+        "_efGain": "**叶子信息向上归约**：当问题只给定叶子节点的信息（如深度、权值等），且需要判断或构造整棵树时，可考虑自底向上合并的策略。通过相邻叶子或子树的归约操作（如合并为父节点），将构造问题转化为序列归约问题，最终判定是否能归约为单个根节点。这是一种将树的构造性判定转化为相邻元素可合并判定的通用思考方式。",
+        "_efDifficulty": 5,
+        "gain": "**叶子信息向上归约**：当问题只给定叶子节点的信息（如深度、权值等），且需要判断或构造整棵树时，可考虑自底向上合并的策略。通过相邻叶子或子树的归约操作（如合并为父节点），将构造问题转化为序列归约问题，最终判定是否能归约为单个根节点。这是一种将树的构造性判定转化为相邻元素可合并判定的通用思考方式。"
+      },
+      {
+        "id": "CF792D",
+        "difficulty": 5,
+        "overview": "给定一棵 $n$ 个节点的完美二叉树（ $n+1$ 为 $2$ 的幂），节点编号按照“中序遍历”（左子树 → 根 → 右子树）方式唯一确定。  \n有 $q$ 次询问，每次给一个起点编号 $u$ 和一条由 `L`（左儿子）、`R`（右儿子）、`U`（父节点）组成的路径字符串。依次执行操作，若某步无法执行（如叶子节点向下、根节点向上）则跳过该步。输出最终停留的节点编号。",
+        "idea": "注意到数据范围极大，考虑找规律。由于是二叉树，同时我们要求的是节点编号，我们关注节点编号的二进制，并发现 ``lowbit`` 推出层数，于是做出。",
+        "gain": "如果是二叉数，同时数据范围极大无比，我们应该找二进制的规律。",
+        "createdAt": 1784437926279
+      },
+      {
+        "id": "P5018",
+        "difficulty": 4,
+        "overview": "给定一棵 $n$ 个节点的二叉树，每个节点有权值。求最大的子树，使得该子树**结构对称且对应节点权值相等**（即左右子树交换后与原树完全相同）。输出该子树的大小（节点数）。",
+        "idea": "直接在每个节点暴力 DFS 检查整棵子树是否对称，总时间复杂度为 $O(n \\log n)$，因为每个节点最多被 $O(\\log n)$ 个祖先作为根节点检查一次，每向上检查一层根节点子树大小至少翻倍。DFS仅需分类讨论都没有儿子、只有一边有儿子、或者递归检查两个儿子即可。",
+        "createdAt": 1784437676571
+      },
+      {
+        "id": "P1229",
+        "difficulty": 3,
+        "overview": "给定二叉树前序和后序遍历，统计所有满足条件的二叉树对应的中序遍历序列总数。",
+        "idea": "我们考虑怎样的结构是不确定的。由于前序和后序遍历的结构，我们发现当只有一个儿子的时候，我们不能确定左儿子还是右儿子到底是谁，于是每当发现前序中相邻的节点对 `(u, v)`，在后序中恰好反向相邻（即 `... v u ...`）时，说明 `u` 只有一个孩子 `v`，左右子树可交换，故答案乘以 $2$。",
+        "createdAt": 1784434640027
+      }
+    ],
+    "knowledge": [
+      {
+        "title": "对偶图",
+        "coreIdea": "对偶图是平面图论中的对偶变换工具，本质是把平面图的每个面转化为一个顶点，把分隔两个面的每条边转化为连接对应顶点的边，从而将原图中关于面的复杂问题，等价转化为关于顶点的常规图论问题来求解。",
+        "keyPoints": [
+          "1. **核心考法**：**平面图最小割 = 对偶图最短路**。把平面连通图的S-T最小割问题，等价转化为对偶图上的单源最短路，用Dijkstra求解，复杂度远低于直接跑最大流。",
+          "2. **标准构造**：处理S-T平面图时，先在S、T间加一条辅助边，将原外部面拆成两个面，分别对应对偶图的源点、汇点；原图每条边对应对偶图一条边，边权与原图一致。",
+          "3. **高频场景**：方格/网格图是最常见的考察载体，格子面对应对偶顶点，相邻格子的公共边对应对偶边，多用于“阻断路径最小代价”“方格切割”类题目。",
+          "4. **解题常用性质**：对偶图一定连通，最短路必然存在；原图边数 = 对偶图边数，复杂度和原图同阶；原图割边对应对偶图自环，最短路计算中可直接忽略。",
+          "5. **易错提醒**：仅平面图可用，非平面图不能套用；必须处理外部面，S-T割场景务必拆分外部面得到源汇；竞赛几乎只考察无向平面图，有向图无标准对偶构造。"
+        ],
+        "id": "mrrvcy1q042sbr8",
+        "createdAt": 1784469992030
+      },
+      {
+        "title": "重链剖分",
+        "coreIdea": "**思想** 将树映射到数组，使任意路径和子树都变成连续区间，从而用线段树维护。 \n\n**预处理（两次 DFS）** \n\n**性质**：同链 `dfn` 连续；子树区间 = `[dfn[u], dfn[u]+sz[u]-1]`。 \n\n**线段树** 维护区间和与懒标记，支持 `update(l,r,val)` 和 `query(l,r)`。 \n\n**操作实现** `while(top[x]!=top[y])`：选 `dep[top]` 更深者，处理 `[dfn[top[x]], dfn[x]]`，`x=fa[top[x]]`；最后同链处理 `[dfn[x], dfn[y]]`。每次 ``swap`` 使得 `x` 深度更大。 \n\n **复杂度**：预处理 O(N)，路径 O(log² N)，子树 O(log N)。\n\n**模板题题面**：给定一棵树，支持路径加/求和、子树加/求和，结果对 `mod` 取模。 **思路**：重链剖分将树映射为数组，使路径和子树变为连续区间，用线段树维护区间加与区间和。",
+        "code": "```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n#define int long long\nconst int N = 1e5 + 2;\nint n, q, r, mod, fa[N], dep[N], sz[N], son[N], top[N], dfn[N], rnk[N], tot, a[N], tag[N * 4];\nvector <int> edge[N];\nstruct node {\n\tint sum, len;\n} tree[N * 4];\nvoid pushup(node &p, const node &ls, const node &rs) {\n\tp.sum = (ls.sum + rs.sum) % mod;\n\tp.len = ls.len + rs.len;\n}\nvoid pushdown(int p) {\n\tif (!tag[p]) return;\n\tint ls = p << 1, rs = p << 1 | 1;\n\ttree[ls].sum = (tree[ls].sum + tree[ls].len * tag[p]) % mod;\n\ttree[rs].sum = (tree[rs].sum + tree[rs].len * tag[p]) % mod;\n\ttag[ls] = (tag[ls] + tag[p]) % mod;\n\ttag[rs] = (tag[rs] + tag[p]) % mod;\n\ttag[p] = 0;\n}\nvoid dfs1 (int x, int ff, int tdp) {\n\tdep[x] = tdp;\n\tfa[x] = ff;\n\tsz[x] = 1;\n\tson[x] = 0;\n\tint tmp = -1;\n\tfor (auto i : edge[x]) {\n\t\tif (i == ff) continue;\n\t\tdfs1(i, x, tdp + 1);\n\t\tsz[x] += sz[i];\n\t\tif (sz[i] > tmp) {\n\t\t\ttmp = sz[i];\n\t\t\tson[x] = i;\n\t\t}\n\t}\n\treturn;\n}\nvoid dfs2 (int x, int topf) {\n\tdfn[x] = ++tot;\n\trnk[tot] = x;\n\ttop[x] = topf;\n\tif (son[x]) {\n\t\tdfs2(son[x], topf);\n\t}\n\tfor (auto i : edge[x]) {\n\t\tif (i == son[x] || i == fa[x]) continue;\n\t\tdfs2 (i, i);\n\t}\n}\nvoid build (int p, int lp, int rp) {\n\tif (lp == rp) {\n\t\ttree[p] = {a[rnk[lp]] % mod, 1};\n\t\treturn;\n\t}\n\tint mid = (lp + rp) >> 1;\n\tbuild(p << 1, lp, mid);\n\tbuild(p << 1 | 1, mid + 1, rp);\n\tpushup(tree[p], tree[p << 1], tree[p << 1 | 1]);\n}\nvoid update (int p, int lp, int rp, int l, int r, int v) {\n\tif (l <= lp && rp <= r) {\n\t\ttree[p].sum = (tree[p].sum + tree[p].len * v) % mod;\n\t\ttag[p] = (tag[p] + v) % mod;\n\t\treturn;\n\t}\n\tpushdown(p);\n\tint mid = (lp + rp) >> 1;\n\tif (l <= mid) update(p << 1, lp, mid, l, r, v);\n\tif (r > mid) update(p << 1 | 1, mid + 1, rp, l, r, v);\n\tpushup(tree[p], tree[p << 1], tree[p << 1 | 1]);\n}\nint query (int p, int lp, int rp, int l, int r) {\n\tif (l <= lp && rp <= r) return tree[p].sum % mod;\n\tpushdown(p);\n\tint mid = (lp + rp) >> 1, res = 0;\n\tif (l <= mid) res = (res + query(p << 1, lp, mid, l, r)) % mod;\n\tif (r > mid) res = (res + query(p << 1 | 1, mid + 1, rp, l, r)) % mod;\n\treturn res;\n}\nvoid add_path(int x, int y, int v) {\n\twhile (top[x] != top[y]) {\n\t\tif (dep[top[x]] < dep[top[y]]) swap(x, y);\n\t\tupdate(1, 1, n, dfn[top[x]], dfn[x], v);\n\t\tx = fa[top[x]];\n\t}\n\tif (dep[x] > dep[y]) swap(x, y);\n\tupdate(1, 1, n, dfn[x], dfn[y], v);\n}\nint query_path(int x, int y) {\n\tint res = 0;\n\twhile (top[x] != top[y]) {\n\t\tif (dep[top[x]] < dep[top[y]]) swap(x, y);\n\t\tres = (res + query(1, 1, n, dfn[top[x]], dfn[x])) % mod;\n\t\tx = fa[top[x]];\n\t}\n\tif (dep[x] > dep[y]) swap(x, y);\n\tres = (res + query(1, 1, n, dfn[x], dfn[y])) % mod;\n\treturn res;\n}\nsigned main () {\n\tios::sync_with_stdio(0); cin.tie(0); cout.tie(0);\n\tcin >> n >> q >> r >> mod;\n\tfor (int i = 1; i <= n; i++) {\n\t\tcin >> a[i];\n\t}\n\tfor (int i = 1; i < n; i++) {\n\t\tint x, y;\n\t\tcin >> x >> y;\n\t\tedge[x].push_back(y);\n\t\tedge[y].push_back(x);\n\t}\n\tdfs1(r, 0, 1);\n\tdfs2(r, r);\n\tbuild(1, 1, n);\n\twhile (q--) {\n\t\tint op, x, y, z;\n\t\tcin >> op >> x;\n\t\tif (op == 1) {\n\t\t\tcin >> y >> z;\n\t\t\tadd_path(x, y, z % mod);\n\t\t}\n\t\telse if (op == 2) {\n\t\t\tcin >> y;\n\t\t\tcout << query_path(x, y) % mod << '\\n';\n\t\t}\n\t\telse if (op == 3) {\n\t\t\tcin >> z;\n\t\t\tupdate(1, 1, n, dfn[x], dfn[x] + sz[x] - 1, z % mod);\n\t\t}\n\t\telse {\n\t\t\tcout << query(1, 1, n, dfn[x], dfn[x] + sz[x] - 1) % mod << '\\n';\n\t\t}\n\t}\n\treturn 0;\n}\n```",
+        "keyPoints": [
+          "**常用变量及函数**",
+          "`dfs1(u, f)`：计算 `fa[u]`（父）、`dep[u]`（深）、`sz[u]`（子树大小）、`son[u]`（重儿子，`sz` 最大者）。",
+          "`dfs2(u, topf)`：优先重儿子遍历，分配 `dfn[u]`（数组下标），记 `rnk[dfn]=u`，标记 `top[u]`（链顶）。",
+          "**子树**（x）：直接区间 `[dfn[x], dfn[x]+sz[x]-1]` 修改/查询。",
+          "**路径**（x→y）：",
+          "**dfs1**：计算 `fa, dep, sz, son`（重儿子），用于剖分预处理。",
+          "**dfs2**：优先重儿子分配 `dfn`，标记 `top`，保证同链 `dfn` 连续。",
+          "**性质**：子树区间 `[dfn[x], dfn[x]+sz[x]-1]`；同链 `dfn` 连续。",
+          "**线段树**：维护区间加和区间和，支持 `update` 与 `query`，依赖懒标记。",
+          "**路径加/查**：`while(top[x]!=top[y])` 选 `dep[top]` 更深者，处理 `[dfn[top[x]], dfn[x]]`，`x=fa[top[x]]`，最后同链处理 `[dfn[x], dfn[y]]`。",
+          "**复杂度**：预处理 `O(N)`，路径 `O(log² N)`，子树 `O(log N)`。"
+        ],
+        "id": "mrr7tcvkfug5nx4",
+        "createdAt": 1784430446960,
+        "_codeExpanded": true,
+        "_editing": false,
+        "_efTitle": "重链剖分",
+        "_efCoreIdea": "**思想** 将树映射到数组，使任意路径和子树都变成连续区间，从而用线段树维护。 \n\n**预处理（两次 DFS）** \n\n**性质**：同链 `dfn` 连续；子树区间 = `[dfn[u], dfn[u]+sz[u]-1]`。 \n\n**线段树** 维护区间和与懒标记，支持 `update(l,r,val)` 和 `query(l,r)`。 \n\n**操作实现** `while(top[x]!=top[y])`：选 `dep[top]` 更深者，处理 `[dfn[top[x]], dfn[x]]`，`x=fa[top[x]]`；最后同链处理 `[dfn[x], dfn[y]]`。每次 ``swap`` 使得 `x` 深度更大。 \n\n **复杂度**：预处理 O(N)，路径 O(log² N)，子树 O(log N)。\n\n**模板题题面**：给定一棵树，支持路径加/求和、子树加/求和，结果对 `mod` 取模。 **思路**：重链剖分将树映射为数组，使路径和子树变为连续区间，用线段树维护区间加与区间和。",
+        "_efCode": "```cpp\n#include <bits/stdc++.h>\nusing namespace std;\n#define int long long\nconst int N = 1e5 + 2;\nint n, q, r, mod, fa[N], dep[N], sz[N], son[N], top[N], dfn[N], rnk[N], tot, a[N], tag[N * 4];\nvector <int> edge[N];\nstruct node {\n\tint sum, len;\n} tree[N * 4];\nvoid pushup(node &p, const node &ls, const node &rs) {\n\tp.sum = (ls.sum + rs.sum) % mod;\n\tp.len = ls.len + rs.len;\n}\nvoid pushdown(int p) {\n\tif (!tag[p]) return;\n\tint ls = p << 1, rs = p << 1 | 1;\n\ttree[ls].sum = (tree[ls].sum + tree[ls].len * tag[p]) % mod;\n\ttree[rs].sum = (tree[rs].sum + tree[rs].len * tag[p]) % mod;\n\ttag[ls] = (tag[ls] + tag[p]) % mod;\n\ttag[rs] = (tag[rs] + tag[p]) % mod;\n\ttag[p] = 0;\n}\nvoid dfs1 (int x, int ff, int tdp) {\n\tdep[x] = tdp;\n\tfa[x] = ff;\n\tsz[x] = 1;\n\tson[x] = 0;\n\tint tmp = -1;\n\tfor (auto i : edge[x]) {\n\t\tif (i == ff) continue;\n\t\tdfs1(i, x, tdp + 1);\n\t\tsz[x] += sz[i];\n\t\tif (sz[i] > tmp) {\n\t\t\ttmp = sz[i];\n\t\t\tson[x] = i;\n\t\t}\n\t}\n\treturn;\n}\nvoid dfs2 (int x, int topf) {\n\tdfn[x] = ++tot;\n\trnk[tot] = x;\n\ttop[x] = topf;\n\tif (son[x]) {\n\t\tdfs2(son[x], topf);\n\t}\n\tfor (auto i : edge[x]) {\n\t\tif (i == son[x] || i == fa[x]) continue;\n\t\tdfs2 (i, i);\n\t}\n}\nvoid build (int p, int lp, int rp) {\n\tif (lp == rp) {\n\t\ttree[p] = {a[rnk[lp]] % mod, 1};\n\t\treturn;\n\t}\n\tint mid = (lp + rp) >> 1;\n\tbuild(p << 1, lp, mid);\n\tbuild(p << 1 | 1, mid + 1, rp);\n\tpushup(tree[p], tree[p << 1], tree[p << 1 | 1]);\n}\nvoid update (int p, int lp, int rp, int l, int r, int v) {\n\tif (l <= lp && rp <= r) {\n\t\ttree[p].sum = (tree[p].sum + tree[p].len * v) % mod;\n\t\ttag[p] = (tag[p] + v) % mod;\n\t\treturn;\n\t}\n\tpushdown(p);\n\tint mid = (lp + rp) >> 1;\n\tif (l <= mid) update(p << 1, lp, mid, l, r, v);\n\tif (r > mid) update(p << 1 | 1, mid + 1, rp, l, r, v);\n\tpushup(tree[p], tree[p << 1], tree[p << 1 | 1]);\n}\nint query (int p, int lp, int rp, int l, int r) {\n\tif (l <= lp && rp <= r) return tree[p].sum % mod;\n\tpushdown(p);\n\tint mid = (lp + rp) >> 1, res = 0;\n\tif (l <= mid) res = (res + query(p << 1, lp, mid, l, r)) % mod;\n\tif (r > mid) res = (res + query(p << 1 | 1, mid + 1, rp, l, r)) % mod;\n\treturn res;\n}\nvoid add_path(int x, int y, int v) {\n\twhile (top[x] != top[y]) {\n\t\tif (dep[top[x]] < dep[top[y]]) swap(x, y);\n\t\tupdate(1, 1, n, dfn[top[x]], dfn[x], v);\n\t\tx = fa[top[x]];\n\t}\n\tif (dep[x] > dep[y]) swap(x, y);\n\tupdate(1, 1, n, dfn[x], dfn[y], v);\n}\nint query_path(int x, int y) {\n\tint res = 0;\n\twhile (top[x] != top[y]) {\n\t\tif (dep[top[x]] < dep[top[y]]) swap(x, y);\n\t\tres = (res + query(1, 1, n, dfn[top[x]], dfn[x])) % mod;\n\t\tx = fa[top[x]];\n\t}\n\tif (dep[x] > dep[y]) swap(x, y);\n\tres = (res + query(1, 1, n, dfn[x], dfn[y])) % mod;\n\treturn res;\n}\nsigned main () {\n\tios::sync_with_stdio(0); cin.tie(0); cout.tie(0);\n\tcin >> n >> q >> r >> mod;\n\tfor (int i = 1; i <= n; i++) {\n\t\tcin >> a[i];\n\t}\n\tfor (int i = 1; i < n; i++) {\n\t\tint x, y;\n\t\tcin >> x >> y;\n\t\tedge[x].push_back(y);\n\t\tedge[y].push_back(x);\n\t}\n\tdfs1(r, 0, 1);\n\tdfs2(r, r);\n\tbuild(1, 1, n);\n\twhile (q--) {\n\t\tint op, x, y, z;\n\t\tcin >> op >> x;\n\t\tif (op == 1) {\n\t\t\tcin >> y >> z;\n\t\t\tadd_path(x, y, z % mod);\n\t\t}\n\t\telse if (op == 2) {\n\t\t\tcin >> y;\n\t\t\tcout << query_path(x, y) % mod << '\\n';\n\t\t}\n\t\telse if (op == 3) {\n\t\t\tcin >> z;\n\t\t\tupdate(1, 1, n, dfn[x], dfn[x] + sz[x] - 1, z % mod);\n\t\t}\n\t\telse {\n\t\t\tcout << query(1, 1, n, dfn[x], dfn[x] + sz[x] - 1) % mod << '\\n';\n\t\t}\n\t}\n\treturn 0;\n}\n```",
+        "_efKeyPoints": "- **常用变量及函数**\n- `dfs1(u, f)`：计算 `fa[u]`（父）、`dep[u]`（深）、`sz[u]`（子树大小）、`son[u]`（重儿子，`sz` 最大者）。\n- `dfs2(u, topf)`：优先重儿子遍历，分配 `dfn[u]`（数组下标），记 `rnk[dfn]=u`，标记 `top[u]`（链顶）。\n- **子树**（x）：直接区间 `[dfn[x], dfn[x]+sz[x]-1]` 修改/查询。\n- **路径**（x→y）：\n- **dfs1**：计算 `fa, dep, sz, son`（重儿子），用于剖分预处理。\n- **dfs2**：优先重儿子分配 `dfn`，标记 `top`，保证同链 `dfn` 连续。\n- **性质**：子树区间 `[dfn[x], dfn[x]+sz[x]-1]`；同链 `dfn` 连续。\n- **线段树**：维护区间加和区间和，支持 `update` 与 `query`，依赖懒标记。\n- **路径加/查**：`while(top[x]!=top[y])` 选 `dep[top]` 更深者，处理 `[dfn[top[x]], dfn[x]]`，`x=fa[top[x]]`，最后同链处理 `[dfn[x], dfn[y]]`。\n- **复杂度**：预处理 `O(N)`，路径 `O(log² N)`，子树 `O(log N)`。"
+      }
+    ]
+  },
+  "2026-07-19": {
+    "date": "2026-07-19",
+    "diary": [],
+    "tricks": [],
+    "problems": [],
+    "knowledge": []
+  },
+  "2026-07-20": {
+    "date": "2026-07-20",
+    "diary": [],
+    "tricks": [],
+    "problems": [],
+    "knowledge": []
+  },
+  "2026-07-21": {
+    "date": "2026-07-21",
+    "diary": [
+      "AtCoder ndpc2026_b",
+      "AtCoder ndpc2026_a"
+    ],
+    "tricks": [],
+    "problems": [
+      {
+        "id": "AtCoder ndpc2026_b",
+        "difficulty": 3,
+        "overview": "$T$ 组 DAG，每组 $N$ 点 $M$ 条有向边，求 $1$ 到 $N$ 的路径总数，模 $998244353$。",
+        "idea": "由于 DAG 和拓扑排序可以使得强大的",
+        "createdAt": 1784641129764,
+        "_editing": false,
+        "_efOverview": "$T$ 组 DAG，每组 $N$ 点 $M$ 条有向边，求 $1$ 到 $N$ 的路径总数，模 $998244353$。",
+        "_efIdea": "由于 DAG 和拓扑排序可以使得强大的",
+        "_efGain": "",
+        "_efDifficulty": 3,
+        "_efId": "AtCoder ndpc2026_b"
+      },
+      {
+        "id": "AtCoder ndpc2026_a",
+        "difficulty": 2,
+        "overview": "现有无限量$2 \\times 1$长方形多米诺骨牌、$2 \\times 2$去掉一个$1 \\times 1$方块构成的L形多米诺骨牌，骨牌可旋转，需完整铺满$2$行$N$列网格，每个格子仅被一块骨牌覆盖；网格整体旋转、翻转得到的铺法视为不同方案，同形状骨牌不作区分，给定整数$1 \\le N \\le 40$，求合法铺法总数。",
+        "idea": "$N$ 极小，考虑动态规划。由于状态需要包含所有情况：令 $dp[i][op]$ 表示考虑到第 $i$ 列，在此之前所有的列都填满，第 $i$ 列的填充情况为 $op$ 的时候。定义 $op = 0、1、2$ 分别表示两行都填满，填了第一行和填了第二行。转移十分简单。",
+        "createdAt": 1784640664684
       }
     ],
     "knowledge": []
