@@ -94,12 +94,11 @@ a:hover{text-decoration:underline}
 .search-box{position:relative}
 .search-box input{width:100%;padding:7px 12px;font-size:0.875rem;border-radius:20px;background:var(--color-bg)}
 .header-right{display:flex;gap:10px;flex-shrink:0;align-items:center}
-.font-slider{display:flex;align-items:center;gap:6px;padding:0 4px;border-right:1px solid var(--color-border);padding-right:12px;margin-right:2px}
-.font-label{font-size:0.6875rem;color:var(--color-text-secondary);font-weight:500}
-.font-label-lg{font-size:0.9375rem;color:var(--color-text-secondary);font-weight:500}
-.font-range{-webkit-appearance:none;appearance:none;width:70px;height:4px;background:var(--color-border);border-radius:2px;outline:none;cursor:pointer;border:none;padding:0}
-.font-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--color-primary);cursor:pointer}
-.font-range::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.font-dropdown{position:relative}
+.font-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:300;min-width:100px;overflow:hidden}
+.font-option{padding:8px 14px;cursor:pointer;font-size:0.875rem;text-align:center;transition:background var(--transition)}
+.font-option:hover{background:var(--color-bg)}
+.font-option.active{color:var(--color-primary);font-weight:600;background:#eef2ff}
 
 /* ===== Module Tabs ===== */
 .module-tabs{display:flex;gap:4px;background:var(--color-border);padding:4px;border-radius:var(--radius);width:fit-content}
@@ -299,10 +298,11 @@ a:hover{text-decoration:underline}
         </div>
       </div>
       <div class="header-right">
-        <div class="font-slider">
-          <span class="font-label">Aa</span>
-          <input type="range" min="14" max="24" step="1" :value="fontSize" @input="onFontSize" class="font-range">
-          <span class="font-label-lg">Aa</span>
+        <div class="font-dropdown">
+          <button class="btn-secondary btn-sm" @click="showFontMenu=!showFontMenu">字体: {{fontLabel}}</button>
+          <div v-if="showFontMenu" class="font-menu">
+            <div v-for="opt in fontOptions" :key="opt.v" :class="['font-option',{active:fontSize===opt.v}]" @click="setFontSize(opt.v)">{{opt.l}}</div>
+          </div>
         </div>
         <button class="btn-secondary btn-sm" @click="exportData">导出整个文件json</button>
         <button class="btn-secondary btn-sm" @click="changeDataFile">更换data</button>
@@ -820,7 +820,8 @@ const app = Vue.createApp({
       currentDate: getTodayStr(),
       currentModule: 'diary',
       currentView: 'home',
-      fontSize: parseInt(localStorage.getItem('fontSize')||'16'),
+      fontSize: parseInt(localStorage.getItem('fontSize')||'18'),
+      showFontMenu: false,
 
       // Sidebar editing
       editingDate: null,
@@ -846,7 +847,9 @@ const app = Vue.createApp({
     dayData() { return this.data[this.currentDate] || null; },
     tabs() { return [{key:'diary',label:'日记'},{key:'tricks',label:'Tricks'},{key:'problems',label:'思路速览'},{key:'knowledge',label:'知识点'}]; },
     importTypes() { return [{key:'diary',label:'日记'},{key:'trick',label:'Trick'},{key:'problem',label:'题目'},{key:'knowledge',label:'知识点'}]; },
-    diffs() { return Object.entries(DIFF_MAP).map(([v,{label}])=>({v:Number(v),l:label})); }
+    diffs() { return Object.entries(DIFF_MAP).map(([v,{label}])=>({v:Number(v),l:label})); },
+    fontOptions() { return [{v:14,l:'小'},{v:16,l:'较小'},{v:18,l:'中'},{v:20,l:'较大'},{v:22,l:'大'}]; },
+    fontLabel() { const m = {'14':'小','16':'较小','18':'中','20':'较大','22':'大'}; return m[this.fontSize]||'中'; }
   },
 
   watch: {
@@ -858,6 +861,12 @@ const app = Vue.createApp({
 
   async mounted() {
     document.documentElement.style.setProperty('--content-font-size', this.fontSize+'px');
+    // 点击页面其他地方关闭字体菜单
+    document.addEventListener('click', (e) => {
+      if (this.showFontMenu && !e.target.closest('.font-dropdown')) {
+        this.showFontMenu = false;
+      }
+    });
     // Try to restore file handle from IndexedDB
     const handle = await getStoredHandle();
     if (handle) {
@@ -1131,7 +1140,7 @@ const app = Vue.createApp({
       return (DIFF_MAP[p ? p.difficulty : 0] || DIFF_MAP[0]).color;
     },
     renderMD: renderMarkdown,
-    onFontSize(e) { this.fontSize = parseInt(e.target.value); },
+    setFontSize(v) { this.fontSize = v; this.showFontMenu = false; },
     fmtDate,
 
     // ===== Export/Import =====
@@ -1140,7 +1149,7 @@ const app = Vue.createApp({
       const blob = new Blob([json], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url;
-      a.download = 'oj-notes-backup-'+new Date().toISOString().slice(0,10)+'.json';
+      a.download = 'OI-Diary-data-'+getTodayStr()+'.json';
       a.click(); URL.revokeObjectURL(url);
     },
     triggerImport() {
