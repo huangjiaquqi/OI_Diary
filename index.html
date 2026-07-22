@@ -86,19 +86,8 @@ a:hover{text-decoration:underline}
 .sidebar-date-edit:focus{border-color:var(--color-primary);outline:none}
 
 /* ===== Header ===== */
-.app-header{display:flex;align-items:center;justify-content:space-between;height:var(--header-height);padding:0 16px;background:var(--color-bg-card);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50;gap:16px}
-.header-left{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.app-header{display:flex;align-items:center;justify-content:space-between;height:var(--header-height);padding:0 12px;background:var(--color-bg-card);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50}
 .menu-btn{font-size:1.25rem}
-.app-title{font-size:1.125rem;font-weight:700;color:var(--color-primary)}
-.header-center{flex:1;max-width:500px;position:relative}
-.search-box{position:relative}
-.search-box input{width:100%;padding:7px 12px;font-size:0.875rem;border-radius:20px;background:var(--color-bg)}
-.header-right{display:flex;gap:10px;flex-shrink:0;align-items:center}
-.font-dropdown{position:relative}
-.font-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:300;min-width:100px;overflow:hidden}
-.font-option{padding:8px 14px;cursor:pointer;font-size:0.875rem;text-align:center;transition:background var(--transition)}
-.font-option:hover{background:var(--color-bg)}
-.font-option.active{color:var(--color-primary);font-weight:600;background:#eef2ff}
 
 /* ===== Module Tabs ===== */
 .module-tabs{display:flex;gap:4px;background:var(--color-border);padding:4px;border-radius:var(--radius);width:fit-content}
@@ -288,25 +277,8 @@ a:hover{text-decoration:underline}
 
     <!-- Header -->
     <header class="app-header">
-      <div class="header-left">
-        <button class="btn-icon menu-btn" @click="sidebarOpen=!sidebarOpen" title="日期列表">☰</button>
-        <h1 class="app-title">OI Diary | 信息学竞赛笔记</h1>
-      </div>
-      <div class="header-center">
-        <div class="search-box">
-          <input v-model="searchQ" type="text" placeholder="搜索题号、Trick、知识点..." @focus="openSearch" @keydown.enter="doSearch">
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="font-dropdown">
-          <button class="btn-secondary btn-sm" @click="showFontMenu=!showFontMenu">字体: {{fontLabel}}</button>
-          <div v-if="showFontMenu" class="font-menu">
-            <div v-for="opt in fontOptions" :key="opt.v" :class="['font-option',{active:fontSize===opt.v}]" @click="setFontSize(opt.v)">{{opt.l}}</div>
-          </div>
-        </div>
-        <button class="btn-secondary btn-sm" @click="exportData">导出整个文件json</button>
-        <button class="btn-secondary btn-sm" @click="changeDataFile">更换data</button>
-      </div>
+      <button class="btn-icon menu-btn" @click="sidebarOpen=!sidebarOpen" title="日期列表">☰</button>
+      <button class="btn-icon" @click="openSearch" title="搜索" style="font-size:1.2rem">🔍</button>
     </header>
 
     <!-- Main Content -->
