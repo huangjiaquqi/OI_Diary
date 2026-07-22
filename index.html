@@ -398,7 +398,7 @@ a:hover{text-decoration:underline}
                     <div class="edit-split">
                       <div class="edit-left">
                         <input v-model="p._efId" placeholder="题号">
-                        <input v-model="p._efOverview" placeholder="题面概览">
+                        <textarea v-model="p._efOverview" placeholder="题面概览" rows="3"></textarea>
                         <textarea v-model="p._efIdea" placeholder="思路概况" rows="5"></textarea>
                         <textarea v-model="p._efGain" placeholder="收获（可选）" rows="4"></textarea>
                         <select v-model.number="p._efDifficulty">
