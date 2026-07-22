@@ -87,7 +87,14 @@ a:hover{text-decoration:underline}
 
 /* ===== Header ===== */
 .app-header{display:flex;align-items:center;justify-content:space-between;height:var(--header-height);padding:0 12px;background:var(--color-bg-card);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:8px}
 .menu-btn{font-size:1.25rem}
+.font-dropdown{position:relative;display:inline-block}
+.font-dropdown-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:60;min-width:100px;overflow:hidden}
+.font-dropdown-item{padding:8px 16px;font-size:0.8125rem;display:block;width:100%;text-align:left;white-space:nowrap}
+.font-dropdown-item:hover{background:var(--color-border)}
+.font-dropdown-item.active{background:#e0e7ff;color:var(--color-primary);font-weight:600}
 
 /* ===== Module Tabs ===== */
 .module-tabs{display:flex;gap:4px;background:var(--color-border);padding:4px;border-radius:var(--radius);width:fit-content}
@@ -278,8 +285,20 @@ a:hover{text-decoration:underline}
 
     <!-- Header -->
     <header class="app-header">
-      <button class="btn-icon menu-btn" @click="sidebarOpen=!sidebarOpen" title="日期列表">☰</button>
-      <button class="btn-icon" @click="openSearch" title="搜索" style="font-size:1.2rem">🔍</button>
+      <div class="header-left">
+        <button class="btn-icon menu-btn" @click="sidebarOpen=!sidebarOpen" title="日期列表">☰</button>
+      </div>
+      <div class="header-right">
+        <div class="font-dropdown">
+          <button class="btn-secondary btn-sm" @click.stop="showFontMenu=!showFontMenu" title="字体大小">{{fontLabel}}</button>
+          <div v-if="showFontMenu" class="font-dropdown-menu">
+            <button v-for="o in fontOptions" :key="o.v" :class="['font-dropdown-item',{active:fontSize===o.v}]" @click.stop="setFontSize(o.v)">{{o.l}}</button>
+          </div>
+        </div>
+        <button class="btn-secondary btn-sm" @click="changeDataFile" title="更换数据文件">📂 更换</button>
+        <button class="btn-secondary btn-sm" @click="exportData" title="导出整个JSON">📥 导出</button>
+        <button class="btn-icon" @click="openSearch" title="搜索" style="font-size:1.2rem">🔍</button>
+      </div>
     </header>
 
     <!-- Main Content -->
