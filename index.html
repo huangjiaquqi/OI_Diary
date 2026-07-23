@@ -114,6 +114,10 @@ a:hover{text-decoration:underline}
 .search-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .search-header h2{font-size:1.25rem;font-weight:700}
 .search-input-row{margin-bottom:20px}
+.search-filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.search-filter-btn{padding:4px 12px;border-radius:20px;font-size:0.75rem;border:1px solid var(--color-border);background:var(--color-bg-card);color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition)}
+.search-filter-btn:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.search-filter-btn.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
 .search-input-lg{width:100%;padding:12px 16px;font-size:1rem;border-radius:var(--radius)}
 .search-input-lg:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(79,70,229,0.15)}
 .search-results{display:flex;flex-direction:column;gap:8px}
@@ -124,6 +128,14 @@ a:hover{text-decoration:underline}
 .result-title{font-weight:600;font-size:0.875rem}
 .result-date{margin-left:auto;font-size:0.75rem;color:var(--color-text-secondary)}
 .result-preview{font-size:0.8125rem;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== Review View ===== */
+.review-view{flex:1;padding:20px 24px;max-width:800px;margin:0 auto;width:100%}
+.review-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px}
+.review-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.review-card-title{font-weight:600;font-size:0.9375rem}
+.review-card-date{font-size:0.75rem;color:var(--color-text-secondary)}
+.review-card-body{font-size:0.875rem;color:var(--color-text);line-height:1.6}
 
 /* ===== Cards ===== */
 .card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:20px 24px;position:relative}
@@ -297,6 +309,7 @@ a:hover{text-decoration:underline}
         </div>
         <button class="btn-secondary btn-sm" @click="changeDataFile" title="更换数据文件">📂 更换</button>
         <button class="btn-secondary btn-sm" @click="exportData" title="导出整个JSON">📥 导出</button>
+        <button class="btn-primary btn-sm" @click="openReview" title="高速复习">⚡ 复习</button>
         <button class="btn-icon" @click="openSearch" title="搜索" style="font-size:1.2rem">🔍</button>
       </div>
     </header>
@@ -307,17 +320,24 @@ a:hover{text-decoration:underline}
       <div v-if="currentView==='search'" class="search-view">
         <div class="search-header">
           <h2>搜索结果</h2>
-          <button class="btn-secondary btn-sm" @click="currentView='home';searchQ='';searchResults=[]">← 返回主页</button>
+          <button class="btn-secondary btn-sm" @click="currentView='home';searchQ='';searchResults=[];searchFilter='all'">← 返回主页</button>
         </div>
         <div class="search-input-row">
           <input v-model="searchQ" type="text" placeholder="搜索任意文本..." class="search-input-lg" @input="doSearch" ref="searchInputRef">
         </div>
-        <div v-if="searchQ.trim()&&searchResults.length===0" class="empty-state">
+        <div class="search-filter-row">
+          <button :class="['search-filter-btn',{active:searchFilter==='all'}]" @click="searchFilter='all'">全部</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='diary'}]" @click="searchFilter='diary'">日记</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='trick'}]" @click="searchFilter='trick'">Trick</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='problem'}]" @click="searchFilter='problem'">题目</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='knowledge'}]" @click="searchFilter='knowledge'">知识点</button>
+        </div>
+        <div v-if="searchQ.trim()&&filteredResults.length===0" class="empty-state">
           <div class="empty-icon">🔍</div>
           <div class="empty-text">未找到匹配结果</div>
         </div>
-        <div v-if="searchResults.length>0" class="search-results">
-          <div v-for="(s,i) in searchResults" :key="i" class="search-result-item" @click="goSuggestion(s)">
+        <div v-if="filteredResults.length>0" class="search-results">
+          <div v-for="(s,i) in filteredResults" :key="i" class="search-result-item" @click="goSuggestion(s)">
             <div class="result-header">
               <span class="result-type-badge">{{typeLabel(s.type)}}</span>
               <span class="result-title">{{s.title}}</span>
@@ -325,6 +345,25 @@ a:hover{text-decoration:underline}
             </div>
             <div class="result-preview">{{s.preview}}</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Review View -->
+      <div v-else-if="currentView==='review'" class="review-view">
+        <div class="search-header">
+          <h2>⚡ 高速复习</h2>
+          <button class="btn-secondary btn-sm" @click="currentView='home'">← 返回主页</button>
+        </div>
+        <div v-if="allTricks.length===0" class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">暂无Tricks</div>
+        </div>
+        <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
+          <div class="review-card-header">
+            <span class="review-card-title">{{item.trick.title}}</span>
+            <span class="review-card-date">{{item.date}}</span>
+          </div>
+          <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
         </div>
       </div>
 
@@ -822,6 +861,7 @@ const app = Vue.createApp({
       // Search
       searchQ: '',
       searchResults: [],
+      searchFilter: 'all',
       fuseInstance: null,
 
       // Import modal
@@ -841,7 +881,19 @@ const app = Vue.createApp({
     importTypes() { return [{key:'diary',label:'日记'},{key:'trick',label:'Trick'},{key:'problem',label:'题目'},{key:'knowledge',label:'知识点'}]; },
     diffs() { return Object.entries(DIFF_MAP).map(([v,{label}])=>({v:Number(v),l:label})); },
     fontOptions() { return [{v:14,l:'小'},{v:16,l:'较小'},{v:18,l:'中'},{v:20,l:'较大'},{v:22,l:'大'}]; },
-    fontLabel() { const m = {'14':'小','16':'较小','18':'中','20':'较大','22':'大'}; return m[this.fontSize]||'中'; }
+    fontLabel() { const m = {'14':'小','16':'较小','18':'中','20':'较大','22':'大'}; return m[this.fontSize]||'中'; },
+    filteredResults() {
+      if (this.searchFilter === 'all') return this.searchResults;
+      return this.searchResults.filter(r => r.type === this.searchFilter);
+    },
+    allTricks() {
+      const items = [];
+      for (const [date, day] of Object.entries(this.data)) {
+        for (const t of day.tricks) items.push({ date, trick: t });
+      }
+      items.sort((a, b) => b.date.localeCompare(a.date));
+      return items;
+    }
   },
 
   watch: {
@@ -1078,10 +1130,15 @@ const app = Vue.createApp({
       this.searchResults = this.fuseInstance.search(q).map(r => r.item);
     },
     goSuggestion(item) {
-      this.searchQ = ''; this.searchResults = []; this.currentView = 'home';
+      this.searchQ = ''; this.searchResults = []; this.searchFilter = 'all'; this.currentView = 'home';
       this.currentDate = item.date;
       const mm = {diary:'diary',trick:'tricks',problem:'problems',knowledge:'knowledge'};
       this.currentModule = mm[item.type]||'diary';
+    },
+
+    // ===== Review =====
+    openReview() {
+      this.currentView = 'review';
     },
 
     // ===== Import =====
