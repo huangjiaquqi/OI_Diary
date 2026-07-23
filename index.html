@@ -326,13 +326,13 @@ a:hover{text-decoration:underline}
           <input v-model="searchQ" type="text" placeholder="搜索任意文本..." class="search-input-lg" @input="doSearch" ref="searchInputRef">
         </div>
         <div class="search-filter-row">
-          <button :class="['search-filter-btn',{active:searchFilter==='all'}]" @click="searchFilter='all'">全部</button>
-          <button :class="['search-filter-btn',{active:searchFilter==='diary'}]" @click="searchFilter='diary'">日记</button>
-          <button :class="['search-filter-btn',{active:searchFilter==='trick'}]" @click="searchFilter='trick'">Trick</button>
-          <button :class="['search-filter-btn',{active:searchFilter==='problem'}]" @click="searchFilter='problem'">题目</button>
-          <button :class="['search-filter-btn',{active:searchFilter==='knowledge'}]" @click="searchFilter='knowledge'">知识点</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='all'}]" @click="setFilter('all')">全部</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='diary'}]" @click="setFilter('diary')">日记</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='trick'}]" @click="setFilter('trick')">Trick</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='problem'}]" @click="setFilter('problem')">题目</button>
+          <button :class="['search-filter-btn',{active:searchFilter==='knowledge'}]" @click="setFilter('knowledge')">知识点</button>
         </div>
-        <div v-if="searchQ.trim()&&filteredResults.length===0" class="empty-state">
+        <div v-if="filteredResults.length===0" class="empty-state">
           <div class="empty-icon">🔍</div>
           <div class="empty-text">未找到匹配结果</div>
         </div>
@@ -795,7 +795,7 @@ function parseKnowledge(text) {
   return {title,coreIdea:ci.join(' ').trim(),code,keyPoints:kp};
 }
 
-function buildSearchIndex(data) {
+function buildSearchItems(data) {
   const items = [];
   for (const [date, day] of Object.entries(data)) {
     for (const pid of day.diary) items.push({
@@ -819,7 +819,11 @@ function buildSearchIndex(data) {
       content: k.title + ' ' + k.coreIdea + ' ' + (k.code||'') + ' ' + (k.keyPoints||[]).join(' ')
     });
   }
-  return new Fuse(items, {
+  return items;
+}
+
+function buildSearchIndex(data) {
+  return new Fuse(buildSearchItems(data), {
     keys: ['title','content'],
     threshold: 0.4,
     ignoreLocation: true,
@@ -1121,11 +1125,19 @@ const app = Vue.createApp({
       this.$nextTick(() => {
         const el = this.$refs.searchInputRef;
         if (el) (Array.isArray(el) ? el[el.length-1] : el).focus();
+        if (!this.searchQ.trim()) this.doSearch();
       });
+    },
+    setFilter(type) {
+      this.searchFilter = type;
+      if (!this.searchQ.trim()) this.doSearch();
     },
     doSearch() {
       const q = this.searchQ.trim();
-      if (!q) { this.searchResults = []; return; }
+      if (!q) {
+        this.searchResults = buildSearchItems(this.data);
+        return;
+      }
       if (!this.fuseInstance) this.fuseInstance = buildSearchIndex(this.data);
       this.searchResults = this.fuseInstance.search(q).map(r => r.item);
     },
