@@ -74,7 +74,7 @@ a:hover{text-decoration:underline}
 .sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:var(--radius);transition:background var(--transition);cursor:pointer}
 .sidebar-item:hover{background:rgba(255,255,255,0.08)}
 .sidebar-item.active{background:rgba(255,255,255,0.12)}
-.sidebar-date{flex:1;font-size:0.875rem}
+.sidebar-date{flex:1;font-size:0.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-actions{display:flex;gap:4px;opacity:0;transition:opacity var(--transition)}
 .sidebar-item:hover .sidebar-actions{opacity:1}
 .sidebar-actions .btn-icon{color:var(--color-text-sidebar);font-size:1rem;width:28px;height:28px}
@@ -168,10 +168,13 @@ a:hover{text-decoration:underline}
 .markdown-body pre code{background:none;padding:0;color:#c9d1d9;font-size:0.8125rem;border-radius:0;word-break:normal}
 .markdown-body blockquote{border-left:4px solid var(--color-primary);padding:8px 14px;margin:10px 0;color:var(--color-text-secondary);background:#f8fafc;border-radius:0 6px 6px 0}
 .markdown-body ul,.markdown-body ol{padding-left:24px;margin:6px 0}
-.markdown-body ul{list-style:none!important}
+.markdown-body ul{list-style:disc}
+.markdown-body ul ul{list-style:circle}
+.markdown-body ul ul ul{list-style:square}
 .markdown-body ol{list-style:decimal}
-.markdown-body li{margin:3px 0;color:#1e293b!important}
-.markdown-body li::marker{content:none!important;display:none!important}
+.markdown-body ol ol{list-style:lower-alpha}
+.markdown-body ol ol ol{list-style:lower-roman}
+.markdown-body li{margin:3px 0}
 .markdown-body table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.8125rem;display:block;overflow-x:auto}
 .markdown-body thead{border-bottom:2px solid var(--color-border)}
 .markdown-body th{background:#f1f5f9;font-weight:600;padding:8px 12px;border:1px solid var(--color-border);text-align:left;white-space:nowrap}
@@ -309,7 +312,13 @@ a:hover{text-decoration:underline}
         </div>
         <button class="btn-secondary btn-sm" @click="changeDataFile" title="更换数据文件">📂 更换</button>
         <button class="btn-secondary btn-sm" @click="exportData" title="导出整个JSON">📥 导出</button>
-        <button class="btn-primary btn-sm" @click="openReview" title="高速复习">⚡ 复习</button>
+        <div class="font-dropdown">
+          <button class="btn-primary btn-sm" @click.stop="showReviewMenu=!showReviewMenu" title="高速复习">⚡ 复习</button>
+          <div v-if="showReviewMenu" class="font-dropdown-menu">
+            <button class="font-dropdown-item" @click.stop="openReview('tricks')">Tricks 快速复习</button>
+            <button class="font-dropdown-item" @click.stop="openReview('knowledge')">知识点 快速复习</button>
+          </div>
+        </div>
         <button class="btn-icon" @click="openSearch" title="搜索" style="font-size:1.2rem">🔍</button>
       </div>
     </header>
@@ -351,20 +360,43 @@ a:hover{text-decoration:underline}
       <!-- Review View -->
       <div v-else-if="currentView==='review'" class="review-view">
         <div class="search-header">
-          <h2>⚡ 高速复习</h2>
+          <h2>⚡ {{ reviewType === 'tricks' ? 'Tricks 快速复习' : '知识点 快速复习' }}</h2>
           <button class="btn-secondary btn-sm" @click="currentView='home'">← 返回主页</button>
         </div>
-        <div v-if="allTricks.length===0" class="empty-state">
-          <div class="empty-icon">📭</div>
-          <div class="empty-text">暂无Tricks</div>
-        </div>
-        <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
-          <div class="review-card-header">
-            <span class="review-card-title">{{item.trick.title}}</span>
-            <span class="review-card-date">{{item.date}}</span>
+        <template v-if="reviewType==='tricks'">
+          <div v-if="allTricks.length===0" class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">暂无Tricks</div>
           </div>
-          <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
-        </div>
+          <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
+            <div class="review-card-header">
+              <span class="review-card-title">{{item.trick.title}}</span>
+              <span class="review-card-date">{{item.date}}</span>
+            </div>
+            <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
+          </div>
+        </template>
+        <template v-else>
+          <div v-if="allKnowledge.length===0" class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">暂无知识点</div>
+          </div>
+          <div v-for="item in allKnowledge" :key="item.date+'-'+item.knowledge.id" class="review-card">
+            <div class="review-card-header">
+              <span class="review-card-title">{{item.knowledge.title}}</span>
+              <span class="review-card-date">{{item.date}}</span>
+            </div>
+            <div class="review-card-body">
+              <div class="core-idea markdown-body" v-html="renderMD(item.knowledge.coreIdea)"></div>
+              <div v-if="item.knowledge.code">
+                <div class="code-block markdown-body" v-html="renderMD(item.knowledge.code)"></div>
+              </div>
+              <ul v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0" class="key-points">
+                <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" v-html="renderMD(kp)"></li>
+              </ul>
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- Home View -->
@@ -701,12 +733,25 @@ function katexRender(formula, display) {
 
 function extractMath(text) {
   const blocks = [];
-  let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_,f) => {
+  let processed = text;
+  // 显示公式: $$...$$ 和 \[...\]
+  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_,f) => {
     const t = f.trim(); if (!t) return '';
     blocks.push({ formula: t, display: true });
     return '<!--MATH_BLOCK_'+(blocks.length-1)+'-->';
   });
+  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_,f) => {
+    const t = f.trim(); if (!t) return '';
+    blocks.push({ formula: t, display: true });
+    return '<!--MATH_BLOCK_'+(blocks.length-1)+'-->';
+  });
+  // 行内公式: $...$ 和 \(...\)
   processed = processed.replace(/(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g, (_,f) => {
+    const t = f.trim(); if (!t) return '';
+    blocks.push({ formula: t, display: false });
+    return '<!--MATH_INLINE_'+(blocks.length-1)+'-->';
+  });
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_,f) => {
     const t = f.trim(); if (!t) return '';
     blocks.push({ formula: t, display: false });
     return '<!--MATH_INLINE_'+(blocks.length-1)+'-->';
@@ -772,29 +817,6 @@ const DIFF_MAP = {
   8:{label:'NOI/NOI+/CTS',color:'#333333'}
 };
 
-function parseTrick(text) {
-  const lines = text.split('\n');
-  const tl = lines.find(l=>l.trim().startsWith('###'));
-  const title = tl ? tl.replace(/^###\s*/,'').trim() : '未命名Trick';
-  const desc = lines.filter(l=>!l.trim().startsWith('###')).join('\n').trim();
-  return {title,description:desc};
-}
-
-function parseKnowledge(text) {
-  const lines = text.split('\n');
-  const tl = lines.find(l=>l.trim().startsWith('###'));
-  const title = tl ? tl.replace(/^###\s*/,'').trim() : '未命名知识点';
-  const cm = text.match(/```[\s\S]*?```/);
-  const code = cm ? cm[0] : undefined;
-  const rest = lines.filter(l=>!l.trim().startsWith('###')&&!l.includes('```'));
-  const kp = [], ci = [];
-  for (const l of rest) {
-    if (l.trim().startsWith('-')) kp.push(l.trim().replace(/^-\s*/,''));
-    else if (l.trim()) ci.push(l.trim());
-  }
-  return {title,coreIdea:ci.join(' ').trim(),code,keyPoints:kp};
-}
-
 function buildSearchItems(data) {
   const items = [];
   for (const [date, day] of Object.entries(data)) {
@@ -857,6 +879,8 @@ const app = Vue.createApp({
       currentView: 'home',
       fontSize: parseInt(localStorage.getItem('fontSize')||'18'),
       showFontMenu: false,
+      showReviewMenu: false,
+      reviewType: 'tricks',
 
       // Sidebar editing
       editingDate: null,
@@ -897,6 +921,14 @@ const app = Vue.createApp({
       }
       items.sort((a, b) => b.date.localeCompare(a.date));
       return items;
+    },
+    allKnowledge() {
+      const items = [];
+      for (const [date, day] of Object.entries(this.data)) {
+        for (const k of day.knowledge) items.push({ date, knowledge: k });
+      }
+      items.sort((a, b) => b.date.localeCompare(a.date));
+      return items;
     }
   },
 
@@ -913,6 +945,9 @@ const app = Vue.createApp({
     document.addEventListener('click', (e) => {
       if (this.showFontMenu && !e.target.closest('.font-dropdown')) {
         this.showFontMenu = false;
+      }
+      if (this.showReviewMenu && !e.target.closest('.font-dropdown')) {
+        this.showReviewMenu = false;
       }
     });
     // Try to restore file handle from IndexedDB
@@ -1149,7 +1184,9 @@ const app = Vue.createApp({
     },
 
     // ===== Review =====
-    openReview() {
+    openReview(type) {
+      this.reviewType = type;
+      this.showReviewMenu = false;
       this.currentView = 'review';
     },
 
@@ -1166,8 +1203,7 @@ const app = Vue.createApp({
         }
         case 'trick': {
           if (!this.impTrickTitle.trim() && !this.impTrickDesc.trim()) return;
-          const parsed = parseTrick('### '+(this.impTrickTitle||'未命名Trick')+'\n'+this.impTrickDesc);
-          this.data[date].tricks = [{...parsed, id: genId(), createdAt: Date.now()}, ...this.data[date].tricks];
+          this.data[date].tricks = [{id:genId(),title:this.impTrickTitle.trim()||'未命名Trick',description:this.impTrickDesc.trim(),createdAt:Date.now()}, ...this.data[date].tricks];
           this.impTrickTitle = ''; this.impTrickDesc = ''; break;
         }
         case 'problem': {
@@ -1179,12 +1215,7 @@ const app = Vue.createApp({
         case 'knowledge': {
           if (!this.impKnowTitle.trim()) return;
           const kp = this.impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean);
-          const parts = ['### '+this.impKnowTitle];
-          if (this.impKnowCore.trim()) parts.push(this.impKnowCore.trim());
-          if (this.impKnowCode.trim()) parts.push(this.impKnowCode.trim());
-          if (kp.length>0) parts.push(kp.map(k=>'- '+k).join('\n'));
-          const parsed = parseKnowledge(parts.join('\n'));
-          this.data[date].knowledge = [{...parsed, id: genId(), createdAt: Date.now()}, ...this.data[date].knowledge];
+          this.data[date].knowledge = [{id:genId(),title:this.impKnowTitle.trim(),coreIdea:this.impKnowCore.trim(),code:this.impKnowCode.trim()||undefined,keyPoints:kp,createdAt:Date.now()}, ...this.data[date].knowledge];
           this.impKnowTitle = ''; this.impKnowCore = ''; this.impKnowCode = ''; this.impKnowKP = ''; break;
         }
       }
