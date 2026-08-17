@@ -733,35 +733,24 @@ function katexRender(formula, display) {
 
 function extractMath(text) {
   const blocks = [];
-  let processed = text;
+  const push = (formula, display) => {
+    const t = formula.trim(); if (!t) return '';
+    blocks.push({ formula: t, display });
+    return (display ? '<!--MATH_BLOCK_' : '<!--MATH_INLINE_')+(blocks.length-1)+'-->';
+  };
   // 显示公式: $$...$$ 和 \[...\]
-  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_,f) => {
-    const t = f.trim(); if (!t) return '';
-    blocks.push({ formula: t, display: true });
-    return '<!--MATH_BLOCK_'+(blocks.length-1)+'-->';
-  });
-  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_,f) => {
-    const t = f.trim(); if (!t) return '';
-    blocks.push({ formula: t, display: true });
-    return '<!--MATH_BLOCK_'+(blocks.length-1)+'-->';
-  });
-  // 行内公式: $...$ 和 \(...\)
-  processed = processed.replace(/(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g, (_,f) => {
-    const t = f.trim(); if (!t) return '';
-    blocks.push({ formula: t, display: false });
-    return '<!--MATH_INLINE_'+(blocks.length-1)+'-->';
-  });
-  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_,f) => {
-    const t = f.trim(); if (!t) return '';
-    blocks.push({ formula: t, display: false });
-    return '<!--MATH_INLINE_'+(blocks.length-1)+'-->';
-  });
+  let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_,f) => push(f, true));
+  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_,f) => push(f, true));
+  // 行内公式: $...$（跳过 \$ 转义）和 \(...\)
+  processed = processed.replace(/(?<![\\$])\$(?!\$)([^$\n]+?)\$(?!\$)/g, (_,f) => push(f, false));
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_,f) => push(f, false));
   return { processed, blocks };
 }
 
 function renderMarkdown(text) {
   if (!text) return '';
   try {
+    // 第一步：围栏代码块原样分段保留
     const segments = [];
     let remaining = text;
     while (remaining.length > 0) {
@@ -778,16 +767,28 @@ function renderMarkdown(text) {
     const allBlocks = [];
     const processedSegs = segments.map(seg => {
       if (seg.type === 'code') return seg.content;
-      const { processed, blocks } = extractMath(seg.content);
+      // 第二步：先保护行内代码，防止其中的 $ 或 \( 干扰公式配对
+      const codeSpans = [];
+      let t = seg.content.replace(/(`+)([\s\S]*?)\1(?!`)/g, (_,b,c) => {
+        codeSpans.push(b+c+b);
+        return '<!--CODE_SPAN_'+(codeSpans.length-1)+'-->';
+      });
+      // 第三步：提取公式
+      const { processed, blocks } = extractMath(t);
       allBlocks.push(...blocks);
-      return processed;
+      // 第四步：还原行内代码，交给 marked 渲染
+      let out = processed;
+      for (let i = 0; i < codeSpans.length; i++)
+        out = out.replace('<!--CODE_SPAN_'+i+'-->', () => codeSpans[i]);
+      return out;
     });
     let html = marked.parse(processedSegs.join(''));
+    // 第五步：还原公式（函数替换，避免 KaTeX 输出中的 $ 被当作特殊模式）
     for (let i = 0; i < allBlocks.length; i++) {
       const { formula, display } = allBlocks[i];
       const ph = display ? '<!--MATH_BLOCK_'+i+'-->' : '<!--MATH_INLINE_'+i+'-->';
       const rendered = katexRender(formula, display);
-      html = html.replace(ph, display ? '<div class="katex-display">'+rendered+'</div>' : rendered);
+      html = html.replace(ph, () => display ? '<div class="katex-display">'+rendered+'</div>' : rendered);
     }
     return html;
   } catch(e) {
