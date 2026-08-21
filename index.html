@@ -190,12 +190,11 @@ a:hover{text-decoration:underline}
 
 /* ===== Card Extras ===== */
 .card-body .core-idea{color:var(--color-text);margin-bottom:8px}
-/* 题目分区标签（题面/思路/收获）：渲染时自动插入在每个分区内容前 */
-.section-tag{display:inline-block;font-size:0.6875rem;font-weight:600;line-height:1.5;padding:1px 8px;border-radius:4px;vertical-align:middle}
-.section-tag.tag-overview{color:#1d4ed8;background:#dbeafe}
-.section-tag.tag-idea{color:#15803d;background:#dcfce7}
-.section-tag.tag-gain{color:#b45309;background:#fef3c7}
-.markdown-body p:has(> .section-tag:only-child){margin-bottom:2px}
+/* 题目分区标题（题面/思路/收获）：仅标题文字着色，独占一行，内容正常渲染 */
+.section-tag{font-weight:700;font-size:0.9375rem}
+.section-tag.tag-overview{color:#1d4ed8}
+.section-tag.tag-idea{color:#15803d}
+.section-tag.tag-gain{color:#b45309}
 .card-body .code-block{margin-top:8px;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-family:var(--font-mono);font-size:0.8125rem;overflow-x:auto;white-space:pre-wrap}
 .card-body .code-block.collapsed{display:none}
 .code-toggle{color:var(--color-primary);font-size:0.8125rem;cursor:pointer;margin-top:4px;display:inline-block}
@@ -1227,10 +1226,10 @@ const app = Vue.createApp({
       return (DIFF_MAP[p ? p.difficulty : 0] || DIFF_MAP[0]).color;
     },
     renderMD: renderMarkdown,
-    // 题目分区（题面概览/思路概况/收获）为固定结构，仅用于编辑时区分内容。
-    // 渲染时合并为整体做纯 Markdown 渲染，每个非空分区前自动插入彩色分区
-    // 标签：先注入 ⟦S⟧ 文本占位符（与公式占位符同模式，避免被 marked 解析），
-    // 渲染完成后再替换为标签 HTML
+    // 题目分区（题面概览/思路概况/收获）为固定分区。渲染时内容按原样
+    // 拼接为整体做纯 Markdown 渲染，唯一区别是每个非空分区前多出一行
+    // 带颜色的标题文字：先注入 ⟦S⟧ 文本占位符（与公式占位符同模式，
+    // 避免被 marked 解析），渲染完成后再替换为着色标题，内容本身零改动
     renderProblemBody(overview, idea, gain) {
       const SECTIONS = [
         { label: '题面', cls: 'tag-overview', seg: overview },
@@ -1243,7 +1242,7 @@ const app = Vue.createApp({
         if (s.seg && s.seg.trim()) {
           const token = '⟦S' + tags.length + '⟧';
           tags.push({ token, label: s.label, cls: s.cls });
-          parts.push(token + '\n\n' + s.seg.trim());
+          parts.push(token + '\n\n' + s.seg);
         }
       }
       if (!parts.length) return '';
