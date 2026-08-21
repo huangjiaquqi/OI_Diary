@@ -189,9 +189,6 @@ a:hover{text-decoration:underline}
 .markdown-body p .katex,.markdown-body li .katex,.markdown-body td .katex{font-size:1em}
 
 /* ===== Card Extras ===== */
-.card-body .overview{margin-bottom:8px;color:var(--color-text)}
-.card-body .idea{padding:8px;background:#f0f9ff;border-radius:6px;margin-bottom:8px}
-.card-body .gain{padding:8px;background:#fefce8;border-radius:6px;font-size:0.8125rem;margin-bottom:8px}
 .card-body .core-idea{color:var(--color-text);margin-bottom:8px}
 .card-body .code-block{margin-top:8px;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-family:var(--font-mono);font-size:0.8125rem;overflow-x:auto;white-space:pre-wrap}
 .card-body .code-block.collapsed{display:none}
@@ -480,9 +477,7 @@ a:hover{text-decoration:underline}
                     </div>
                   </div>
                   <div v-if="!p._editing" class="card-body">
-                    <div class="overview markdown-body" v-html="renderMD(p.overview)"></div>
-                    <div class="idea markdown-body" v-html="renderMD(p.idea)"></div>
-                    <div v-if="p.gain" class="gain markdown-body" v-html="renderMD(p.gain)"></div>
+                    <div class="markdown-body" v-html="renderProblemBody(p.overview, p.idea, p.gain)"></div>
                   </div>
                   <div v-else class="card-body edit-mode">
                     <div class="edit-split">
@@ -497,9 +492,7 @@ a:hover{text-decoration:underline}
                       </div>
                       <div class="edit-right">
                         <div class="edit-preview-title">预览</div>
-                        <div class="overview markdown-body" v-html="renderMD(p._efOverview)"></div>
-                        <div class="idea markdown-body" v-html="renderMD(p._efIdea)"></div>
-                        <div v-if="p._efGain" class="gain markdown-body" v-html="renderMD(p._efGain)"></div>
+                        <div class="markdown-body" v-html="renderProblemBody(p._efOverview, p._efIdea, p._efGain)"></div>
                       </div>
                     </div>
                     <div class="edit-actions">
@@ -614,9 +607,7 @@ a:hover{text-decoration:underline}
               </div>
               <div class="edit-right">
                 <div class="edit-preview-title">预览</div>
-                <div class="overview markdown-body" v-html="renderMD(impProbOverview)"></div>
-                <div class="idea markdown-body" v-html="renderMD(impProbIdea)"></div>
-                <div v-if="impProbGain" class="gain markdown-body" v-html="renderMD(impProbGain)"></div>
+                <div class="markdown-body" v-html="renderProblemBody(impProbOverview, impProbIdea, impProbGain)"></div>
               </div>
             </div>
           </div>
@@ -659,7 +650,7 @@ a:hover{text-decoration:underline}
 </div>
 
 <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+<script src="marked.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
@@ -713,15 +704,21 @@ async function writeLocalFile(handle, data) {
   await writable.close();
 }
 
-// ==================== Markdown ====================
-marked.setOptions({ gfm: true, breaks: true, pedantic: false });
-const origRenderer = new marked.Renderer();
-origRenderer.code = function(code, language) {
-  const validLang = language && hljs.getLanguage(language);
-  const highlighted = validLang ? hljs.highlight(code, { language }).value : hljs.highlightAuto(code).value;
-  return '<pre><code class="hljs'+(validLang?' language-'+language:'')+'">'+highlighted+'</code></pre>';
-};
-marked.setOptions({ renderer: origRenderer });
+// ==================== Markdown (marked v18.0.10 完整内联，迁移自 marked-master) ====================
+// v18 API：通过 marked.use() 注册扩展；renderer 方法接收 token 对象（{text, lang, escaped}）
+marked.use({
+  gfm: true,
+  breaks: true,
+  renderer: {
+    code({ text, lang }) {
+      const language = (lang || '').trim().split(/\s+/)[0];
+      const validLang = language && hljs.getLanguage(language);
+      const code = text.replace(/\n$/, '');
+      const highlighted = validLang ? hljs.highlight(code, { language }).value : hljs.highlightAuto(code).value;
+      return '<pre><code class="hljs'+(validLang?' language-'+language:'')+'">'+highlighted+'</code></pre>';
+    }
+  }
+});
 
 function katexRender(formula, display) {
   try {
@@ -744,8 +741,11 @@ function renderMarkdown(text) {
     while (i < n) {
       const rest = text.slice(i);
       let m;
-      // 围栏代码块
-      if ((m = rest.match(/^```[\s\S]*?^```/m))) { out += m[0]; i += m[0].length; continue; }
+      // 围栏代码块（必须先用 startsWith 锚定当前位置：正则的 ^ 带 m 标志时
+      // 还能匹配 rest 内后续任意行首，若当前位置不是 ```，引擎会跳到后面的
+      // 行首 ``` 才匹配成功，m[0] 起点便不是 i，按 i += m[0].length 推进会
+      // 丢掉前面的普通文本、并让围栏尾部被重复扫描，产生代码块内容重复错乱）
+      if (text.startsWith('```', i) && (m = rest.match(/^```[\s\S]*?^```/m))) { out += m[0]; i += m[0].length; continue; }
       // 行内代码（含多个反引号包裹的形式），原样保留
       if (text[i] === '`' && (m = rest.match(/^(`+)[\s\S]*?\1(?!`)/))) { out += m[0]; i += m[0].length; continue; }
       // $..$ / $$..$$（\$ 转义跳过）
@@ -1221,6 +1221,11 @@ const app = Vue.createApp({
       return (DIFF_MAP[p ? p.difficulty : 0] || DIFF_MAP[0]).color;
     },
     renderMD: renderMarkdown,
+    // 题目分段（题面概览/思路概况/收获）仅用于编辑时区分内容，
+    // 渲染时直接拼接为一个整体做纯 Markdown 渲染，不附加任何额外渲染
+    renderProblemBody(...segs) {
+      return renderMarkdown(segs.filter(s => s && s.trim()).join('\n\n'));
+    },
     setFontSize(v) { this.fontSize = v; this.showFontMenu = false; },
     fmtDate,
 

@@ -53,7 +53,7 @@
 | 技术 | 用途 |
 |------|------|
 | Vue 3 | 前端框架 |
-| Marked | Markdown 渲染 |
+| Marked v18.0.10（本地内置 marked.js） | Markdown 渲染 |
 | highlight.js | 代码高亮 |
 | KaTeX | 数学公式渲染 |
 | Fuse.js | 全文搜索 |
@@ -73,7 +73,8 @@ Firefox 和 Safari 暂不支持。
 
 ```
 OI Diary/
-├── index.html          # 单文件应用
+├── index.html          # 应用主体（HTML/CSS/Vue 应用代码）
+├── marked.js           # Markdown 渲染引擎（marked v18.0.10 UMD 完整版，本地内置）
 ├── data/
 │   └── notes.json      # 数据文件（需自行创建，初始内容为 {}）
 └── README.md
