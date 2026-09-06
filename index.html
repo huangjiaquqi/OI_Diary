@@ -209,6 +209,9 @@ a:hover{text-decoration:underline}
 .diary-item:hover .delete-btn{opacity:1;visibility:visible}
 .difficulty-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .diff-label-text{font-size:0.75rem;font-weight:500;white-space:nowrap}
+/* 题目链接图标：卡片标题内可快速点击跳转 */
+.problem-link{font-size:0.8125rem;text-decoration:none;opacity:0.65;transition:opacity var(--transition);line-height:1}
+.problem-link:hover{opacity:1}
 .cards-grid{display:grid;gap:12px;grid-template-columns:1fr}
 
 /* ===== Edit Mode ===== */
@@ -475,6 +478,7 @@ a:hover{text-decoration:underline}
                       <span class="difficulty-dot" :style="{background:diffColor(p.difficulty)}"></span>
                       <span class="diff-label-text" :style="{color:diffColor(p.difficulty)}">{{diffLabel(p.difficulty)}}</span>
                       <span class="problem-id">{{p.id}}</span>
+                      <a v-if="p.link" class="problem-link" :href="p.link" target="_blank" rel="noopener" :title="'打开题目链接：'+p.link">🔗</a>
                     </div>
                     <div :class="['card-actions',{'editing-visible':p._editing}]">
                       <button class="btn-icon" @click="startEditProblem(p)" title="修改">✏️</button>
@@ -488,6 +492,7 @@ a:hover{text-decoration:underline}
                     <div class="edit-split">
                       <div class="edit-left">
                         <input v-model="p._efId" placeholder="题号">
+                        <input v-model="p._efLink" placeholder="题目链接（可选）">
                         <textarea v-model="p._efOverview" placeholder="题面概览" rows="3"></textarea>
                         <textarea v-model="p._efIdea" placeholder="思路概况" rows="5"></textarea>
                         <textarea v-model="p._efGain" placeholder="收获（可选）" rows="4"></textarea>
@@ -605,6 +610,7 @@ a:hover{text-decoration:underline}
             <div class="edit-split">
               <div class="edit-left">
                 <div class="form-group"><label>题号</label><input v-model="impProbId" placeholder="P1001"></div>
+                <div class="form-group"><label>题目链接（可选）</label><input v-model="impProbLink" placeholder="https://www.luogu.com.cn/problem/P1001"></div>
                 <div class="form-group"><label>难度</label><select v-model.number="impProbDiff"><option v-for="d in diffs" :key="d.v" :value="d.v">{{d.l}}</option></select></div>
                 <div class="form-group"><label>题面概览</label><textarea v-model="impProbOverview" placeholder="简述题目大意..." rows="4"></textarea></div>
                 <div class="form-group"><label>思路概况</label><textarea v-model="impProbIdea" placeholder="解题思路..." rows="4"></textarea></div>
@@ -827,7 +833,7 @@ function buildSearchItems(data) {
     for (const p of day.problems) items.push({
       date, type: 'problem', id: p.id, title: p.id,
       preview: p.overview + ' | ' + p.idea,
-      content: p.id + ' ' + (DIFF_MAP[p.difficulty]||DIFF_MAP[0]).label + ' ' + p.overview + ' ' + p.idea + ' ' + (p.gain||'')
+      content: p.id + ' ' + (DIFF_MAP[p.difficulty]||DIFF_MAP[0]).label + ' ' + p.overview + ' ' + p.idea + ' ' + (p.gain||'') + ' ' + (p.link||'')
     });
     for (const k of day.knowledge) items.push({
       date, type: 'knowledge', id: k.id, title: k.title,
@@ -1115,11 +1121,12 @@ const app = Vue.createApp({
     deleteTrick(id) { if (confirm('删除 Trick？')) { const day = this.data[this.currentDate]; if (day) day.tricks = day.tricks.filter(t=>t.id!==id); this.save(); } },
 
     // ===== Problem =====
-    startEditProblem(p) { p._editing = true; p._efId = p.id; p._efOverview = p.overview; p._efIdea = p.idea; p._efGain = p.gain||''; p._efDifficulty = p.difficulty; },
+    startEditProblem(p) { p._editing = true; p._efId = p.id; p._efLink = p.link||''; p._efOverview = p.overview; p._efIdea = p.idea; p._efGain = p.gain||''; p._efDifficulty = p.difficulty; },
     cancelEditProblem(p) { p._editing = false; },
     saveEditProblem(p) {
       const oldId = p.id;
       p.id = p._efId.trim();
+      p.link = p._efLink.trim()||undefined;
       p.overview = p._efOverview; p.idea = p._efIdea;
       p.gain = p._efGain||undefined; p.difficulty = p._efDifficulty;
       p._editing = false;
