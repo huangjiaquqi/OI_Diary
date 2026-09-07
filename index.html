@@ -212,17 +212,6 @@ a:hover{text-decoration:underline}
 /* 题目链接图标：卡片标题内可快速点击跳转 */
 .problem-link{font-size:0.8125rem;text-decoration:none;opacity:0.65;transition:opacity var(--transition);line-height:1}
 .problem-link:hover{opacity:1}
-/* 题号可点击链接样式 */
-.diary-pid-link,
-.problem-id-link {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-}
-.diary-pid-link:hover,
-.problem-id-link:hover {
-  text-decoration: underline;
-}
 .cards-grid{display:grid;gap:12px;grid-template-columns:1fr}
 
 /* ===== Edit Mode ===== */
@@ -432,8 +421,7 @@ a:hover{text-decoration:underline}
               <div v-if="dayData.diary.length>0" class="diary-list">
                 <div v-for="pid in dayData.diary" :key="pid" class="diary-item">
                   <span class="difficulty-dot" :style="{background:diaryColor(pid)}"></span>
-                  <a v-if="getProblemLink(pid)" :href="getProblemLink(pid)" target="_blank" class="diary-pid-link">{{pid}}</a>
-                  <span v-else class="diary-pid">{{pid}}</span>
+                  <span class="diary-pid">{{pid}}</span>
                   <button class="delete-btn" @click="deleteDiaryItem(pid)" title="删除">×</button>
                 </div>
               </div>
@@ -489,8 +477,7 @@ a:hover{text-decoration:underline}
                     <div class="card-title">
                       <span class="difficulty-dot" :style="{background:diffColor(p.difficulty)}"></span>
                       <span class="diff-label-text" :style="{color:diffColor(p.difficulty)}">{{diffLabel(p.difficulty)}}</span>
-                      <a v-if="p.link" :href="p.link" target="_blank" class="problem-id-link">{{p.id}}</a>
-                      <span v-else class="problem-id">{{p.id}}</span>
+                      <span class="problem-id">{{p.id}}</span>
                       <a v-if="p.link" class="problem-link" :href="p.link" target="_blank" rel="noopener" :title="'打开题目链接：'+p.link">🔗</a>
                     </div>
                     <div :class="['card-actions',{'editing-visible':p._editing}]">
@@ -1244,13 +1231,6 @@ const app = Vue.createApp({
       if (!day) return DIFF_MAP[0].color;
       const p = day.problems.find(x => x.id === pid);
       return (DIFF_MAP[p ? p.difficulty : 0] || DIFF_MAP[0]).color;
-    },
-    // 新增：根据题号查找当前日期的题目链接
-    getProblemLink(pid) {
-      const day = this.data[this.currentDate];
-      if (!day) return null;
-      const problem = day.problems.find(p => p.id === pid);
-      return problem && problem.link ? problem.link : null;
     },
     renderMD: renderMarkdown,
     // 题目分区（题面概览/思路概况/收获）为固定分区。渲染时内容按原样
