@@ -125,7 +125,6 @@ a:hover{text-decoration:underline}
 .search-result-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
 .result-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .result-type-badge{font-size:0.6875rem;padding:2px 6px;border-radius:4px;background:#e0e7ff;color:var(--color-primary)}
-.result-title{font-weight:600;font-size:0.875rem}
 .result-date{margin-left:auto;font-size:0.75rem;color:var(--color-text-secondary)}
 .result-preview{font-size:0.8125rem;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -133,14 +132,14 @@ a:hover{text-decoration:underline}
 .review-view{flex:1;padding:20px 24px;max-width:800px;margin:0 auto;width:100%}
 .review-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px}
 .review-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.review-card-title{font-weight:600;font-size:0.9375rem}
 .review-card-date{font-size:0.75rem;color:var(--color-text-secondary)}
 .review-card-body{font-size:0.875rem;color:var(--color-text);line-height:1.6}
 
 /* ===== Cards ===== */
 .card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:20px 24px;position:relative}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;height:24px}
-.card-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.9375rem;line-height:1.4}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:24px}
+/* 标题不带任何自带渲染（加粗/字号），显示效果完全由用户输入的 Markdown 决定 */
+.card-title{display:flex;align-items:center;gap:8px;line-height:1.4}
 .card-actions{display:flex;gap:4px;position:absolute;top:20px;right:24px;opacity:0;visibility:hidden;transition:opacity 0.15s,visibility 0.15s;z-index:10}
 .card:hover .card-actions,.card-actions.editing-visible{opacity:1;visibility:visible}
 .card-actions .btn-icon{background:transparent;padding:4px 6px;border-radius:4px;font-size:1rem;color:var(--color-text);display:inline-flex;align-items:center;justify-content:center;line-height:1}
@@ -354,7 +353,7 @@ a:hover{text-decoration:underline}
           <div v-for="(s,i) in filteredResults" :key="i" class="search-result-item" @click="goSuggestion(s)">
             <div class="result-header">
               <span class="result-type-badge">{{typeLabel(s.type)}}</span>
-              <span class="result-title">{{s.title}}</span>
+              <span class="result-title markdown-body" v-html="renderMD(s.title)"></span>
               <span class="result-date">{{s.date}}</span>
             </div>
             <div class="result-preview">{{s.preview}}</div>
@@ -375,7 +374,7 @@ a:hover{text-decoration:underline}
           </div>
           <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
             <div class="review-card-header">
-              <span class="review-card-title">{{item.trick.title}}</span>
+              <span class="review-card-title markdown-body" v-html="renderMD(item.trick.title)"></span>
               <span class="review-card-date">{{item.date}}</span>
             </div>
             <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
@@ -388,7 +387,7 @@ a:hover{text-decoration:underline}
           </div>
           <div v-for="item in allKnowledge" :key="item.date+'-'+item.knowledge.id" class="review-card">
             <div class="review-card-header">
-              <span class="review-card-title">{{item.knowledge.title}}</span>
+              <span class="review-card-title markdown-body" v-html="renderMD(item.knowledge.title)"></span>
               <span class="review-card-date">{{item.date}}</span>
             </div>
             <div class="review-card-body">
@@ -421,7 +420,7 @@ a:hover{text-decoration:underline}
               <div v-if="dayData.diary.length>0" class="diary-list">
                 <div v-for="pid in dayData.diary" :key="pid" class="diary-item">
                   <span class="difficulty-dot" :style="{background:diaryColor(pid)}"></span>
-                  <span class="diary-pid">{{pid}}</span>
+                  <span class="diary-pid markdown-body" v-html="renderMD(pid)"></span>
                   <button class="delete-btn" @click="deleteDiaryItem(pid)" title="删除">×</button>
                 </div>
               </div>
@@ -436,7 +435,7 @@ a:hover{text-decoration:underline}
               <div v-if="dayData.tricks.length>0" class="cards-grid">
                 <div v-for="t in dayData.tricks" :key="t.id" :class="['card',{editing:t._editing}]">
                   <div class="card-header">
-                    <div class="card-title">{{t.title}}</div>
+                    <div class="card-title"><div class="markdown-body" v-html="renderMD(t.title)"></div></div>
                     <div :class="['card-actions',{'editing-visible':t._editing}]">
                       <button class="btn-icon" @click="startEditTrick(t)" title="修改">✏️</button>
                       <button class="btn-icon btn-delete" @click="deleteTrick(t.id)" title="删除">✕</button>
@@ -477,7 +476,7 @@ a:hover{text-decoration:underline}
                     <div class="card-title">
                       <span class="difficulty-dot" :style="{background:diffColor(p.difficulty)}"></span>
                       <span class="diff-label-text" :style="{color:diffColor(p.difficulty)}">{{diffLabel(p.difficulty)}}</span>
-                      <span class="problem-id">{{p.id}}</span>
+                      <div class="problem-id markdown-body" v-html="renderMD(p.id)"></div>
                       <a v-if="p.link" class="problem-link" :href="p.link" target="_blank" rel="noopener" :title="'打开题目链接：'+p.link">🔗</a>
                     </div>
                     <div :class="['card-actions',{'editing-visible':p._editing}]">
@@ -523,7 +522,7 @@ a:hover{text-decoration:underline}
               <div v-if="dayData.knowledge.length>0" class="cards-grid">
                 <div v-for="k in dayData.knowledge" :key="k.id" :class="['card',{editing:k._editing}]">
                   <div class="card-header">
-                    <div class="card-title">{{k.title}}</div>
+                    <div class="card-title"><div class="markdown-body" v-html="renderMD(k.title)"></div></div>
                     <div :class="['card-actions',{'editing-visible':k._editing}]">
                       <button class="btn-icon" @click="startEditKnowledge(k)" title="修改">✏️</button>
                       <button class="btn-icon btn-delete" @click="deleteKnowledge(k.id)" title="删除">✕</button>
