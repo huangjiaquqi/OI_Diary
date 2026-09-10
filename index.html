@@ -896,7 +896,7 @@ const app = Vue.createApp({
       importTargetDate: '',
       importType: 'diary',
       impDiary: '', impTrickTitle: '', impTrickDesc: '',
-      impProbId: '', impProbDiff: 0, impProbOverview: '', impProbIdea: '', impProbGain: '',
+      impProbId: '', impProbDiff: 0, impProbLink: '', impProbOverview: '', impProbIdea: '', impProbGain: '',
       impKnowTitle: '', impKnowCore: '', impKnowCode: '', impKnowKP: '',
     };
   },
@@ -1208,9 +1208,9 @@ const app = Vue.createApp({
         }
         case 'problem': {
           if (!this.impProbId.trim()) return;
-          this.data[date].problems = [{id:this.impProbId.trim(),difficulty:this.impProbDiff,overview:this.impProbOverview.trim(),idea:this.impProbIdea.trim(),gain:this.impProbGain.trim()||undefined,createdAt:Date.now()}, ...this.data[date].problems];
+          this.data[date].problems = [{id:this.impProbId.trim(),difficulty:this.impProbDiff,link:this.impProbLink.trim()||undefined,overview:this.impProbOverview.trim(),idea:this.impProbIdea.trim(),gain:this.impProbGain.trim()||undefined,createdAt:Date.now()}, ...this.data[date].problems];
           if (!this.data[date].diary.includes(this.impProbId.trim())) this.data[date].diary = [this.impProbId.trim(), ...this.data[date].diary];
-          this.impProbId = ''; this.impProbDiff = 0; this.impProbOverview = ''; this.impProbIdea = ''; this.impProbGain = ''; break;
+          this.impProbId = ''; this.impProbDiff = 0; this.impProbLink = ''; this.impProbOverview = ''; this.impProbIdea = ''; this.impProbGain = ''; break;
         }
         case 'knowledge': {
           if (!this.impKnowTitle.trim()) return;
