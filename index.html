@@ -396,7 +396,7 @@ a:hover{text-decoration:underline}
                 <div class="code-block markdown-body" v-html="renderMD(item.knowledge.code)"></div>
               </div>
               <ul v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0" class="key-points">
-                <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" v-html="renderMD(kp)"></li>
+                <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
               </ul>
             </div>
           </div>
@@ -535,7 +535,7 @@ a:hover{text-decoration:underline}
                       <span class="code-toggle" @click="k._codeExpanded=!k._codeExpanded">{{k._codeExpanded?'收起代码 ▲':'展开代码 ▼'}}</span>
                     </div>
                     <ul v-if="k.keyPoints&&k.keyPoints.length>0" class="key-points">
-                      <li v-for="(kp,i) in k.keyPoints" :key="i" v-html="renderMD(kp)"></li>
+                      <li v-for="(kp,i) in k.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                     </ul>
                   </div>
                   <div v-else class="card-body edit-mode">
@@ -551,7 +551,7 @@ a:hover{text-decoration:underline}
                         <div class="core-idea markdown-body" v-html="renderMD(k._efCoreIdea)"></div>
                         <div v-if="k._efCode" class="code-block markdown-body" v-html="renderMD(k._efCode)"></div>
                         <ul v-if="k._efKeyPoints" class="key-points">
-                          <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" v-html="renderMD(kp)"></li>
+                          <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                         </ul>
                       </div>
                     </div>
@@ -634,7 +634,7 @@ a:hover{text-decoration:underline}
                 <div class="core-idea markdown-body" v-html="renderMD(impKnowCore)"></div>
                 <div v-if="impKnowCode" class="code-block markdown-body" v-html="renderMD(impKnowCode)"></div>
                 <ul v-if="impKnowKP" class="key-points">
-                  <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" v-html="renderMD(kp)"></li>
+                  <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                 </ul>
               </div>
             </div>
