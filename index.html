@@ -198,8 +198,9 @@ a:hover{text-decoration:underline}
 .card-body .code-block.collapsed{display:none}
 .code-toggle{color:var(--color-primary);font-size:0.8125rem;cursor:pointer;margin-top:4px;display:inline-block}
 .key-points{margin-top:8px;padding-left:0;list-style:none!important}
-.key-points li{padding:4px 0;font-size:0.8125rem;color:#1e293b!important;list-style:none!important}
-.key-points li::before,.key-points li::after,.key-points li::marker{content:none!important;display:none!important}
+/* 外层容器 li 无标记；用 > 限定直接子代，用户以 - 输入的嵌套无序列表正常显示圆点 */
+.key-points>li{padding:4px 0;font-size:0.8125rem;color:#1e293b!important;list-style:none!important}
+.key-points>li::before,.key-points>li::after,.key-points>li::marker{content:none!important;display:none!important}
 
 /* ===== Diary ===== */
 .diary-list{display:flex;flex-direction:column;gap:6px}
@@ -551,7 +552,7 @@ a:hover{text-decoration:underline}
                         <div class="core-idea markdown-body" v-html="renderMD(k._efCoreIdea)"></div>
                         <div v-if="k._efCode" class="code-block markdown-body" v-html="renderMD(k._efCode)"></div>
                         <ul v-if="k._efKeyPoints" class="key-points">
-                          <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                          <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                         </ul>
                       </div>
                     </div>
@@ -634,7 +635,7 @@ a:hover{text-decoration:underline}
                 <div class="core-idea markdown-body" v-html="renderMD(impKnowCore)"></div>
                 <div v-if="impKnowCode" class="code-block markdown-body" v-html="renderMD(impKnowCode)"></div>
                 <ul v-if="impKnowKP" class="key-points">
-                  <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                  <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                 </ul>
               </div>
             </div>
@@ -1144,11 +1145,11 @@ const app = Vue.createApp({
     },
 
     // ===== Knowledge =====
-    startEditKnowledge(k) { k._editing = true; k._efTitle = k.title; k._efCoreIdea = k.coreIdea; k._efCode = k.code||''; k._efKeyPoints = (k.keyPoints||[]).map(kp=>'- '+kp).join('\n'); },
+    startEditKnowledge(k) { k._editing = true; k._efTitle = k.title; k._efCoreIdea = k.coreIdea; k._efCode = k.code||''; k._efKeyPoints = (k.keyPoints||[]).join('\n'); },
     cancelEditKnowledge(k) { k._editing = false; },
     saveEditKnowledge(k) {
       k.title = k._efTitle; k.coreIdea = k._efCoreIdea; k.code = k._efCode||undefined;
-      k.keyPoints = k._efKeyPoints.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean);
+      k.keyPoints = k._efKeyPoints.split('\n').map(s=>s.trim()).filter(Boolean);
       k._editing = false; this.save();
     },
     deleteKnowledge(id) { if (confirm('删除知识点？')) { const day = this.data[this.currentDate]; if (day) day.knowledge = day.knowledge.filter(k=>k.id!==id); this.save(); } },
@@ -1214,7 +1215,7 @@ const app = Vue.createApp({
         }
         case 'knowledge': {
           if (!this.impKnowTitle.trim()) return;
-          const kp = this.impKnowKP.split('\n').map(s=>s.trim().replace(/^-\s*/,'')).filter(Boolean);
+          const kp = this.impKnowKP.split('\n').map(s=>s.trim()).filter(Boolean);
           this.data[date].knowledge = [{id:genId(),title:this.impKnowTitle.trim(),coreIdea:this.impKnowCore.trim(),code:this.impKnowCode.trim()||undefined,keyPoints:kp,createdAt:Date.now()}, ...this.data[date].knowledge];
           this.impKnowTitle = ''; this.impKnowCore = ''; this.impKnowCode = ''; this.impKnowKP = ''; break;
         }
