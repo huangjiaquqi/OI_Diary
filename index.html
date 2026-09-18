@@ -265,7 +265,7 @@ a:hover{text-decoration:underline}
     <div class="file-select-card">
       <div class="file-select-icon">📁</div>
       <h2 class="file-select-title">选择数据文件</h2>
-      <p class="file-select-hint">请选择 <code>data/notes.json</code> 文件<br>之后每次打开都会自动记住</p>
+      <p class="file-select-hint">请选择 <code>data/notes.json</code> 文件<br>{{ fsaSupported ? '之后每次打开都会自动记住' : '当前浏览器不支持直接写回文件：改动会自动保存在浏览器内，可用「导出」按钮随时下载 JSON' }}</p>
       <button class="file-select-btn" @click="selectFile" :disabled="selectingFile">
         {{ selectingFile ? '选择中...' : '选择 notes.json' }}
       </button>
@@ -715,6 +715,15 @@ async function writeLocalFile(handle, data) {
   await writable.close();
 }
 
+// ==================== 降级存储（浏览器无 File System Access API 时用 localStorage 持久化） ====================
+const FALLBACK_KEY = 'oi-diary-fallback-data';
+function saveFallbackData(data, name) {
+  try { localStorage.setItem(FALLBACK_KEY, JSON.stringify({ name: name || '', data })); return true; } catch { return false; }
+}
+function loadFallbackData() {
+  try { const raw = localStorage.getItem(FALLBACK_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+}
+
 // ==================== Markdown (marked v18.0.10 完整内联，迁移自 marked-master) ====================
 // v18 API：通过 marked.use() 注册扩展；renderer 方法接收 token 对象（{text, lang, escaped}）
 marked.use({
@@ -864,6 +873,9 @@ const app = Vue.createApp({
       selectingFile: false,
       fileStatus: '',
       fileError: '',
+      // 浏览器不支持 File System Access API 时走降级模式（input 读文件 + localStorage 保存）
+      fsaSupported: typeof window !== 'undefined' && 'showOpenFilePicker' in window,
+      fallbackName: '',
 
       // Data
       data: {},
@@ -965,17 +977,54 @@ const app = Vue.createApp({
         }
       } catch { /* need to re-select */ }
     }
+    // 浏览器不支持 FSA 时，尝试从 localStorage 恢复上次的数据（替代 IndexedDB 句柄恢复）
+    if (!this.fsaSupported) {
+      const saved = loadFallbackData();
+      if (saved && saved.data && Object.keys(saved.data).length) {
+        this.data = saved.data;
+        this.fallbackName = saved.name || '';
+        this.fuseInstance = null;
+        this.fileReady = true;
+        return;
+      }
+    }
     // If we get here, we need user to select the file
     // Don't auto-show picker, let user click button
   },
 
   methods: {
     // ===== File Selection =====
+    // 降级模式：用 input[type=file] 选文件（无 showOpenFilePicker 的浏览器如 Firefox/Safari）
+    pickFileFallback() {
+      return new Promise(resolve => {
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = '.json';
+        input.onchange = () => resolve(input.files[0] || null);
+        input.click();
+      });
+    },
+    async loadFallbackFile(file) {
+      let parsed;
+      try { parsed = JSON.parse(await file.text()); } catch { throw new Error('文件读取失败：JSON 格式不正确'); }
+      this.fileHandle = null;
+      this.fallbackName = file.name;
+      this.data = parsed;
+      saveFallbackData(this.data, this.fallbackName);
+      this.fuseInstance = null;
+      this.fileReady = true;
+    },
     async selectFile() {
       this.selectingFile = true;
       this.fileError = '';
       this.fileStatus = '';
       try {
+        if (!this.fsaSupported) {
+          const file = await this.pickFileFallback();
+          if (!file) { this.fileStatus = '已取消选择'; return; }
+          await this.loadFallbackFile(file);
+          this.fileStatus = '数据加载成功（此浏览器不支持直接写回文件，改动自动保存在浏览器内，可用导出按钮下载 JSON）';
+          return;
+        }
         const [handle] = await window.showOpenFilePicker({
           types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
           multiple: false
@@ -1018,6 +1067,15 @@ const app = Vue.createApp({
 
     async changeDataFile() {
       try {
+        if (!this.fsaSupported) {
+          const file = await this.pickFileFallback();
+          if (!file) return;
+          await this.loadFallbackFile(file);
+          this.saveOk = true;
+          clearTimeout(this.saveTimer);
+          this.saveTimer = setTimeout(() => { this.saveOk = false; }, 1200);
+          return;
+        }
         const [handle] = await window.showOpenFilePicker({
           types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
           multiple: false
@@ -1039,7 +1097,20 @@ const app = Vue.createApp({
     },
 
     async save() {
-      if (!this.fileHandle) return;
+      // 降级模式：改动写入 localStorage 持久化（浏览器不支持直接写回文件）
+      if (!this.fileHandle) {
+        if (!this.fileReady) return;
+        this.saveError = null;
+        if (saveFallbackData(this.data, this.fallbackName)) {
+          this.fuseInstance = null;
+          this.saveOk = true;
+          clearTimeout(this.saveTimer);
+          this.saveTimer = setTimeout(() => { this.saveOk = false; }, 1200);
+        } else {
+          this.saveError = '浏览器存储空间不足，保存失败，请及时用导出按钮下载数据';
+        }
+        return;
+      }
       this.saveError = null;
       try {
         await writeLocalFile(this.fileHandle, this.data);
@@ -1268,7 +1339,7 @@ const app = Vue.createApp({
       const blob = new Blob([json], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url;
-      a.download = 'OI-Diary-data-'+getTodayStr()+'.json';
+      a.download = this.fileHandle ? 'OI-Diary-data-'+getTodayStr()+'.json' : (this.fallbackName || 'OI-Diary-data-'+getTodayStr()+'.json');
       a.click(); URL.revokeObjectURL(url);
     },
     triggerImport() {
