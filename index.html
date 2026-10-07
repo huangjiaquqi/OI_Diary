@@ -130,8 +130,8 @@ a:hover{text-decoration:underline}
 
 /* ===== Review View ===== */
 .review-view{flex:1;padding:20px 40px;max-width:1400px;margin:0 auto;width:100%}
-/* 快速复习列表：宽屏自适应多列 */
-.review-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
+/* 快速复习列表：每个块占满一整行 */
+.review-grid{display:grid;gap:12px;grid-template-columns:1fr}
 .review-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px}
 .review-grid>.review-card{margin-bottom:0}
 .review-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -206,8 +206,7 @@ a:hover{text-decoration:underline}
 .key-points>li::before,.key-points>li::after,.key-points>li::marker{content:none!important;display:none!important}
 
 /* ===== Diary ===== */
-/* 宽屏自适应多列，避免单个题号条目横跨整行显得空旷 */
-.diary-list{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.diary-list{display:flex;flex-direction:column;gap:6px}
 .diary-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f1f5f9;border-radius:6px;font-family:var(--font-mono);font-size:0.875rem}
 .diary-item .delete-btn{opacity:0;visibility:hidden;transition:opacity 0.2s,visibility 0.2s;font-size:1rem;color:var(--color-danger);font-weight:bold;cursor:pointer;padding:0 4px;line-height:1;background:transparent;border:none;margin-left:auto}
 .diary-item:hover .delete-btn{opacity:1;visibility:visible}
@@ -216,8 +215,8 @@ a:hover{text-decoration:underline}
 /* 题目链接图标：卡片标题内可快速点击跳转 */
 .problem-link{font-size:0.8125rem;text-decoration:none;opacity:0.65;transition:opacity var(--transition);line-height:1}
 .problem-link:hover{opacity:1}
-/* 卡片网格：宽屏自适应多列，窄屏退化为单列 */
-.cards-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(440px,1fr))}
+/* 卡片网格：每个块占满一整行（不并排挤在多列） */
+.cards-grid{display:grid;gap:14px;grid-template-columns:1fr}
 
 /* ===== Edit Mode ===== */
 .edit-mode{display:flex;flex-direction:column;gap:8px}
