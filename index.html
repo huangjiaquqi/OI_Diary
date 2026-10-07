@@ -49,7 +49,7 @@ a:hover{text-decoration:underline}
 
 /* ===== File Select Screen ===== */
 .file-select-overlay{position:fixed;inset:0;background:var(--color-bg);display:flex;align-items:center;justify-content:center;z-index:999}
-.file-select-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:40px 36px;width:400px;text-align:center}
+.file-select-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:40px 36px;width:460px;text-align:center}
 .file-select-icon{font-size:3rem;margin-bottom:16px}
 .file-select-title{font-size:1.125rem;font-weight:700;margin-bottom:8px}
 .file-select-hint{font-size:0.8125rem;color:var(--color-text-secondary);margin-bottom:20px;line-height:1.6}
@@ -103,14 +103,14 @@ a:hover{text-decoration:underline}
 .module-tab.active{background:var(--color-bg-card);color:var(--color-primary);box-shadow:var(--shadow-sm)}
 
 /* ===== Home View ===== */
-.home-view{flex:1;padding:20px 32px;max-width:1300px;margin:0 auto;width:100%;position:relative}
+.home-view{flex:1;padding:20px 40px;max-width:1800px;margin:0 auto;width:100%;position:relative}
 .home-header{display:flex;align-items:center;justify-content:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px}
 .home-actions{display:flex;align-items:center;gap:12px}
 .home-content{min-height:300px}
 .date-badge{position:fixed;bottom:20px;right:24px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:10px 16px;font-size:0.8125rem;font-weight:600;color:var(--color-text-secondary);box-shadow:var(--shadow-md);z-index:40}
 
 /* ===== Search View ===== */
-.search-view{flex:1;padding:20px 24px;max-width:700px;margin:0 auto;width:100%}
+.search-view{flex:1;padding:20px 40px;max-width:1200px;margin:0 auto;width:100%}
 .search-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .search-header h2{font-size:1.25rem;font-weight:700}
 .search-input-row{margin-bottom:20px}
@@ -129,8 +129,11 @@ a:hover{text-decoration:underline}
 .result-preview{font-size:0.8125rem;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ===== Review View ===== */
-.review-view{flex:1;padding:20px 24px;max-width:800px;margin:0 auto;width:100%}
+.review-view{flex:1;padding:20px 40px;max-width:1400px;margin:0 auto;width:100%}
+/* 快速复习列表：宽屏自适应多列 */
+.review-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
 .review-card{background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px}
+.review-grid>.review-card{margin-bottom:0}
 .review-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .review-card-date{font-size:0.75rem;color:var(--color-text-secondary)}
 .review-card-body{font-size:0.875rem;color:var(--color-text);line-height:1.6}
@@ -203,7 +206,8 @@ a:hover{text-decoration:underline}
 .key-points>li::before,.key-points>li::after,.key-points>li::marker{content:none!important;display:none!important}
 
 /* ===== Diary ===== */
-.diary-list{display:flex;flex-direction:column;gap:6px}
+/* 宽屏自适应多列，避免单个题号条目横跨整行显得空旷 */
+.diary-list{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
 .diary-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f1f5f9;border-radius:6px;font-family:var(--font-mono);font-size:0.875rem}
 .diary-item .delete-btn{opacity:0;visibility:hidden;transition:opacity 0.2s,visibility 0.2s;font-size:1rem;color:var(--color-danger);font-weight:bold;cursor:pointer;padding:0 4px;line-height:1;background:transparent;border:none;margin-left:auto}
 .diary-item:hover .delete-btn{opacity:1;visibility:visible}
@@ -212,7 +216,8 @@ a:hover{text-decoration:underline}
 /* 题目链接图标：卡片标题内可快速点击跳转 */
 .problem-link{font-size:0.8125rem;text-decoration:none;opacity:0.65;transition:opacity var(--transition);line-height:1}
 .problem-link:hover{opacity:1}
-.cards-grid{display:grid;gap:12px;grid-template-columns:1fr}
+/* 卡片网格：宽屏自适应多列，窄屏退化为单列 */
+.cards-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(440px,1fr))}
 
 /* ===== Edit Mode ===== */
 .edit-mode{display:flex;flex-direction:column;gap:8px}
@@ -221,13 +226,14 @@ a:hover{text-decoration:underline}
 .edit-actions{display:flex;gap:8px;justify-content:flex-end}
 .edit-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .edit-left{display:flex;flex-direction:column;gap:8px;min-width:0}
-.edit-right{overflow-y:auto;max-height:520px;border:1px solid var(--color-border);border-radius:var(--radius);padding:14px 16px;background:var(--color-bg);min-width:0}
+.edit-right{overflow-y:auto;max-height:600px;border:1px solid var(--color-border);border-radius:var(--radius);padding:14px 16px;background:var(--color-bg);min-width:0}
 .edit-right .edit-preview-title{font-weight:600;font-size:0.8125rem;color:var(--color-text-secondary);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--color-border)}
-.card.editing{max-width:none}
+/* 编辑中的卡片占满整行（编辑区为左右双栏，需要全宽） */
+.card.editing{max-width:none;grid-column:1/-1}
 
 /* ===== Modal ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:var(--color-bg-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:1100px;max-height:85vh;display:flex;flex-direction:column}
+.modal{background:var(--color-bg-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:1500px;max-height:85vh;display:flex;flex-direction:column}
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--color-border)}
 .modal-header h3{font-size:1rem;font-weight:600}
 .modal-close{font-size:1.125rem;color:var(--color-text-secondary);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
@@ -373,12 +379,14 @@ a:hover{text-decoration:underline}
             <div class="empty-icon">📭</div>
             <div class="empty-text">暂无Tricks</div>
           </div>
-          <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
-            <div class="review-card-header">
-              <span class="review-card-title markdown-body" v-html="renderMD(item.trick.title)"></span>
-              <span class="review-card-date">{{item.date}}</span>
+          <div v-else class="review-grid">
+            <div v-for="item in allTricks" :key="item.date+'-'+item.trick.id" class="review-card">
+              <div class="review-card-header">
+                <span class="review-card-title markdown-body" v-html="renderMD(item.trick.title)"></span>
+                <span class="review-card-date">{{item.date}}</span>
+              </div>
+              <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
             </div>
-            <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
           </div>
         </template>
         <template v-else>
@@ -386,19 +394,21 @@ a:hover{text-decoration:underline}
             <div class="empty-icon">📭</div>
             <div class="empty-text">暂无知识点</div>
           </div>
-          <div v-for="item in allKnowledge" :key="item.date+'-'+item.knowledge.id" class="review-card">
-            <div class="review-card-header">
-              <span class="review-card-title markdown-body" v-html="renderMD(item.knowledge.title)"></span>
-              <span class="review-card-date">{{item.date}}</span>
-            </div>
-            <div class="review-card-body">
-              <div class="core-idea markdown-body" v-html="renderMD(item.knowledge.coreIdea)"></div>
-              <div v-if="item.knowledge.code">
-                <div class="code-block markdown-body" v-html="renderMD(item.knowledge.code)"></div>
+          <div v-else class="review-grid">
+            <div v-for="item in allKnowledge" :key="item.date+'-'+item.knowledge.id" class="review-card">
+              <div class="review-card-header">
+                <span class="review-card-title markdown-body" v-html="renderMD(item.knowledge.title)"></span>
+                <span class="review-card-date">{{item.date}}</span>
               </div>
-              <ul v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0" class="key-points">
-                <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
-              </ul>
+              <div class="review-card-body">
+                <div class="core-idea markdown-body" v-html="renderMD(item.knowledge.coreIdea)"></div>
+                <div v-if="item.knowledge.code">
+                  <div class="code-block markdown-body" v-html="renderMD(item.knowledge.code)"></div>
+                </div>
+                <ul v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0" class="key-points">
+                  <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                </ul>
+              </div>
             </div>
           </div>
         </template>
