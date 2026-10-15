@@ -136,6 +136,9 @@ a:hover{text-decoration:underline}
 .review-grid>.review-card{margin-bottom:0}
 .review-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .review-card-date{font-size:0.75rem;color:var(--color-text-secondary)}
+/* 题目快速复习的标题行：难度点 + 难度标签 + 题号 + 链接图标 */
+/* 题号不加自带样式，显示效果由用户输入的 Markdown 决定（与卡片标题一致） */
+.review-prob-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
 .review-card-body{font-size:0.875rem;color:var(--color-text);line-height:1.6}
 
 /* ===== Cards ===== */
@@ -326,6 +329,7 @@ a:hover{text-decoration:underline}
           <button class="btn-primary btn-sm" @click.stop="showReviewMenu=!showReviewMenu" title="高速复习">⚡ 复习</button>
           <div v-if="showReviewMenu" class="font-dropdown-menu">
             <button class="font-dropdown-item" @click.stop="openReview('tricks')">Tricks 快速复习</button>
+            <button class="font-dropdown-item" @click.stop="openReview('problems')">题目 快速复习</button>
             <button class="font-dropdown-item" @click.stop="openReview('knowledge')">知识点 快速复习</button>
           </div>
         </div>
@@ -370,7 +374,7 @@ a:hover{text-decoration:underline}
       <!-- Review View -->
       <div v-else-if="currentView==='review'" class="review-view">
         <div class="search-header">
-          <h2>⚡ {{ reviewType === 'tricks' ? 'Tricks 快速复习' : '知识点 快速复习' }}</h2>
+          <h2>⚡ {{ reviewTitle }}</h2>
           <button class="btn-secondary btn-sm" @click="currentView='home'">← 返回主页</button>
         </div>
         <template v-if="reviewType==='tricks'">
@@ -388,7 +392,7 @@ a:hover{text-decoration:underline}
             </div>
           </div>
         </template>
-        <template v-else>
+        <template v-else-if="reviewType==='knowledge'">
           <div v-if="allKnowledge.length===0" class="empty-state">
             <div class="empty-icon">📭</div>
             <div class="empty-text">暂无知识点</div>
@@ -408,6 +412,26 @@ a:hover{text-decoration:underline}
                   <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div v-if="allProblems.length===0" class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">暂无题目</div>
+          </div>
+          <div v-else class="review-grid">
+            <div v-for="item in allProblems" :key="item.date+'-'+item.problem.id" class="review-card">
+              <div class="review-card-header">
+                <div class="review-prob-title">
+                  <span class="difficulty-dot" :style="{background:diffColor(item.problem.difficulty)}"></span>
+                  <span class="diff-label-text" :style="{color:diffColor(item.problem.difficulty)}">{{diffLabel(item.problem.difficulty)}}</span>
+                  <span class="problem-id markdown-body" v-html="renderMD(item.problem.id)"></span>
+                  <a v-if="item.problem.link" class="problem-link" :href="item.problem.link" target="_blank" rel="noopener" :title="'打开题目链接：'+item.problem.link">🔗</a>
+                </div>
+                <span class="review-card-date">{{item.date}}</span>
+              </div>
+              <div class="review-card-body markdown-body" v-html="renderProblemBody(item.problem.overview, item.problem.idea, item.problem.gain)"></div>
             </div>
           </div>
         </template>
@@ -950,6 +974,17 @@ const app = Vue.createApp({
       }
       items.sort((a, b) => b.date.localeCompare(a.date));
       return items;
+    },
+    allProblems() {
+      const items = [];
+      for (const [date, day] of Object.entries(this.data)) {
+        for (const p of day.problems) items.push({ date, problem: p });
+      }
+      items.sort((a, b) => b.date.localeCompare(a.date));
+      return items;
+    },
+    reviewTitle() {
+      return { tricks: 'Tricks 快速复习', problems: '题目 快速复习', knowledge: '知识点 快速复习' }[this.reviewType] || '快速复习';
     }
   },
 
