@@ -195,11 +195,20 @@ a:hover{text-decoration:underline}
 
 /* ===== Card Extras ===== */
 .card-body .core-idea{color:var(--color-text);margin-bottom:8px}
-/* 题目分区标题（题面/思路/收获）：仅标题文字着色，独占一行，内容正常渲染 */
+/* 分区标题（题面/思路/收获、核心思想/代码/关键点/描述）：仅标题文字着色，独占一行，内容正常渲染 */
 .section-tag{font-weight:700;font-size:0.9375rem}
 .section-tag.tag-overview{color:#1d4ed8}
 .section-tag.tag-idea{color:#15803d}
 .section-tag.tag-gain{color:#b45309}
+/* 知识点分区配色 */
+.section-tag.tag-core{color:#1d4ed8}
+.section-tag.tag-code{color:#7c3aed}
+.section-tag.tag-keys{color:#b45309}
+/* Trick 分区配色 */
+.section-tag.tag-desc{color:#15803d}
+/* 分区标题行（用于代码/关键点等非 Markdown 连续块之前） */
+.section-label{margin:12px 0 6px}
+.section-label:first-child{margin-top:0}
 .card-body .code-block{margin-top:8px;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-family:var(--font-mono);font-size:0.8125rem;overflow-x:auto;white-space:pre-wrap}
 .card-body .code-block.collapsed{display:none}
 .code-toggle{color:var(--color-primary);font-size:0.8125rem;cursor:pointer;margin-top:4px;display:inline-block}
@@ -388,7 +397,10 @@ a:hover{text-decoration:underline}
                 <span class="review-card-title markdown-body" v-html="renderMD(item.trick.title)"></span>
                 <span class="review-card-date">{{item.date}}</span>
               </div>
-              <div class="review-card-body markdown-body" v-html="renderMD(item.trick.description)"></div>
+              <div class="review-card-body">
+                <div v-if="item.trick.description" class="section-label"><span class="section-tag tag-desc">描述</span></div>
+                <div class="markdown-body" v-html="renderMD(item.trick.description)"></div>
+              </div>
             </div>
           </div>
         </template>
@@ -404,13 +416,18 @@ a:hover{text-decoration:underline}
                 <span class="review-card-date">{{item.date}}</span>
               </div>
               <div class="review-card-body">
+                <div v-if="item.knowledge.coreIdea" class="section-label"><span class="section-tag tag-core">核心思想</span></div>
                 <div class="core-idea markdown-body" v-html="renderMD(item.knowledge.coreIdea)"></div>
-                <div v-if="item.knowledge.code">
+                <template v-if="item.knowledge.code">
+                  <div class="section-label"><span class="section-tag tag-code">代码</span></div>
                   <div class="code-block markdown-body" v-html="renderMD(item.knowledge.code)"></div>
-                </div>
-                <ul v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0" class="key-points">
-                  <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
-                </ul>
+                </template>
+                <template v-if="item.knowledge.keyPoints&&item.knowledge.keyPoints.length>0">
+                  <div class="section-label"><span class="section-tag tag-keys">关键点</span></div>
+                  <ul class="key-points">
+                    <li v-for="(kp,i) in item.knowledge.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                  </ul>
+                </template>
               </div>
             </div>
           </div>
@@ -476,6 +493,7 @@ a:hover{text-decoration:underline}
                     </div>
                   </div>
                   <div v-if="!t._editing" class="card-body">
+                    <div v-if="t.description" class="section-label"><span class="section-tag tag-desc">描述</span></div>
                     <div class="description markdown-body" v-html="renderMD(t.description)"></div>
                   </div>
                   <div v-else class="card-body edit-mode">
@@ -486,6 +504,7 @@ a:hover{text-decoration:underline}
                       </div>
                       <div class="edit-right">
                         <div class="edit-preview-title">预览</div>
+                        <div v-if="t._efDesc" class="section-label"><span class="section-tag tag-desc">描述</span></div>
                         <div class="markdown-body" v-html="renderMD(t._efDesc)"></div>
                       </div>
                     </div>
@@ -563,14 +582,19 @@ a:hover{text-decoration:underline}
                     </div>
                   </div>
                   <div v-if="!k._editing" class="card-body">
+                    <div v-if="k.coreIdea" class="section-label"><span class="section-tag tag-core">核心思想</span></div>
                     <div class="core-idea markdown-body" v-html="renderMD(k.coreIdea)"></div>
-                    <div v-if="k.code">
-                      <div :class="['code-block markdown-body',{collapsed:!k._codeExpanded}]" v-html="renderMD(k.code)"></div>
+                    <template v-if="k.code">
+                      <div class="section-label"><span class="section-tag tag-code">代码</span></div>
+                      <div class="code-block markdown-body" :class="{collapsed:!k._codeExpanded}" v-html="renderMD(k.code)"></div>
                       <span class="code-toggle" @click="k._codeExpanded=!k._codeExpanded">{{k._codeExpanded?'收起代码 ▲':'展开代码 ▼'}}</span>
-                    </div>
-                    <ul v-if="k.keyPoints&&k.keyPoints.length>0" class="key-points">
-                      <li v-for="(kp,i) in k.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
-                    </ul>
+                    </template>
+                    <template v-if="k.keyPoints&&k.keyPoints.length>0">
+                      <div class="section-label"><span class="section-tag tag-keys">关键点</span></div>
+                      <ul class="key-points">
+                        <li v-for="(kp,i) in k.keyPoints" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                      </ul>
+                    </template>
                   </div>
                   <div v-else class="card-body edit-mode">
                     <div class="edit-split">
@@ -582,11 +606,18 @@ a:hover{text-decoration:underline}
                       </div>
                       <div class="edit-right">
                         <div class="edit-preview-title">预览</div>
+                        <div v-if="k._efCoreIdea" class="section-label"><span class="section-tag tag-core">核心思想</span></div>
                         <div class="core-idea markdown-body" v-html="renderMD(k._efCoreIdea)"></div>
-                        <div v-if="k._efCode" class="code-block markdown-body" v-html="renderMD(k._efCode)"></div>
-                        <ul v-if="k._efKeyPoints" class="key-points">
-                          <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
-                        </ul>
+                        <template v-if="k._efCode">
+                          <div class="section-label"><span class="section-tag tag-code">代码</span></div>
+                          <div class="code-block markdown-body" v-html="renderMD(k._efCode)"></div>
+                        </template>
+                        <template v-if="k._efKeyPoints">
+                          <div class="section-label"><span class="section-tag tag-keys">关键点</span></div>
+                          <ul class="key-points">
+                            <li v-for="(kp,i) in k._efKeyPoints.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                          </ul>
+                        </template>
                       </div>
                     </div>
                     <div class="edit-actions">
@@ -635,6 +666,7 @@ a:hover{text-decoration:underline}
               </div>
               <div class="edit-right">
                 <div class="edit-preview-title">预览</div>
+                <div v-if="impTrickDesc" class="section-label"><span class="section-tag tag-desc">描述</span></div>
                 <div class="markdown-body" v-html="renderMD(impTrickDesc)"></div>
               </div>
             </div>
@@ -665,11 +697,18 @@ a:hover{text-decoration:underline}
               </div>
               <div class="edit-right">
                 <div class="edit-preview-title">预览</div>
+                <div v-if="impKnowCore" class="section-label"><span class="section-tag tag-core">核心思想</span></div>
                 <div class="core-idea markdown-body" v-html="renderMD(impKnowCore)"></div>
-                <div v-if="impKnowCode" class="code-block markdown-body" v-html="renderMD(impKnowCode)"></div>
-                <ul v-if="impKnowKP" class="key-points">
-                  <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
-                </ul>
+                <template v-if="impKnowCode">
+                  <div class="section-label"><span class="section-tag tag-code">代码</span></div>
+                  <div class="code-block markdown-body" v-html="renderMD(impKnowCode)"></div>
+                </template>
+                <template v-if="impKnowKP">
+                  <div class="section-label"><span class="section-tag tag-keys">关键点</span></div>
+                  <ul class="key-points">
+                    <li v-for="(kp,i) in impKnowKP.split('\n').map(s=>s.trim()).filter(Boolean)" :key="i" class="markdown-body" v-html="renderMD(kp)"></li>
+                  </ul>
+                </template>
               </div>
             </div>
           </div>
